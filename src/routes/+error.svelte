@@ -48,6 +48,7 @@
 
   .icon {
     margin-bottom: 1.5rem;
+    font-size: var(--fs-h1);
     animation: fadeInUp 300ms ease-out;
   }
 
