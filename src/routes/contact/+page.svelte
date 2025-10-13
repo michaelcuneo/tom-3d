@@ -14,7 +14,7 @@
 <Lander header="3D Sound FX" subheader="Contact" image="" position="center" />
 <section class="contact-wrapper">
   <div class="contact-panel">
-    <h1>Have a project in mind?</h1>
+    <h2>Have a project in mind?</h2>
 
     {#if submitted}
       <p class="thank-you">Thanks for your message! I’ll get back to you soon.</p>
@@ -63,7 +63,7 @@
     color: oklch(0.18 0.01 260);
   }
 
-  h1 {
+  h2 {
     margin-bottom: 2rem;
     text-align: center;
   }

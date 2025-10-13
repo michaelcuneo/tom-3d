@@ -9,7 +9,7 @@
 	--radius: 0.75rem;
 	--blur: 4px;
 	--shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-	/* Font sizes for headings and text */
+	/* Font Sizes */
 	--fs-h1: clamp(2.25rem, 1.2rem + 4vw, 5rem);
 	--fs-h2: clamp(1.75rem, 1rem + 2.5vw, 3rem);
 	--fs-h3: clamp(1.5rem, 0.9rem + 2vw, 2.5rem);
@@ -18,10 +18,29 @@
 	--fs-h6: clamp(1rem, 0.65rem + 0.8vw, 1.25rem);
 	--fs-body: clamp(1rem, 0.9rem + 0.5vw, 1.2rem);
 	--fs-small: clamp(0.875rem, 0.7rem + 0.4vw, 1rem);
+
+	/* Font Weights */
+	--fw-light: 300;
+	--fw-normal: 400;
+	--fw-medium: 500;
+	--fw-semibold: 600;
+	--fw-bold: 700;
+
+	/* Line Heights */
+	--lh-tight: 1.2;
+	--lh-normal: 1.5;
+	--lh-loose: 1.75;
+
+	/* Letter Spacing */
+	--ls-tight: -0.015em;
+	--ls-normal: 0;
+	--ls-wide: 0.05em;
 }
 
 body {
 	min-height: 100dvh;
+	margin: 0;
+	padding: 0;
 	display: flex;
 	flex-direction: column;
 	font-family: 'Roboto', sans-serif;
@@ -45,22 +64,42 @@ html {
 
 h1 {
 	font-size: var(--fs-h1);
+	font-weight: var(--fw-bold);
+	line-height: var(--lh-tight);
+	letter-spacing: var(--ls-tight);
 }
+
 h2 {
 	font-size: var(--fs-h2);
+	font-weight: var(--fw-semibold);
+	line-height: var(--lh-tight);
 }
+
 h3 {
 	font-size: var(--fs-h3);
+	font-weight: var(--fw-semibold);
+	line-height: var(--lh-normal);
+	letter-spacing: var(--ls-tight);
 }
+
 h4 {
 	font-size: var(--fs-h4);
+	font-weight: var(--fw-medium);
+	line-height: var(--lh-normal);
 }
+
 h5 {
 	font-size: var(--fs-h5);
+	font-weight: var(--fw-medium);
+	line-height: var(--lh-normal);
 }
+
 h6 {
 	font-size: var(--fs-h6);
+	font-weight: var(--fw-medium);
+	line-height: var(--lh-normal);
 }
+
 p,
 li,
 label,
@@ -68,10 +107,14 @@ input,
 textarea,
 button {
 	font-size: var(--fs-body);
+	font-weight: var(--fw-normal);
+	line-height: var(--lh-normal);
 }
 
 small {
 	font-size: var(--fs-small);
+	font-weight: var(--fw-light);
+	line-height: var(--lh-loose);
 }
 
 html,

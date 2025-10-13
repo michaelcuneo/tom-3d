@@ -4,10 +4,12 @@
 
   let { data }: { data: Projects } = $props();
 
+  let time = new Date(Date.now());
+
   $inspect(data);
 </script>
 
-<Lander header="3D Sound FX" subheader="Recent Projects" image="" position="center" />
+<Lander header="3D Sound FX" subheader="Recent Projects" image="" position="center" updated={time} />
 <section class="projects-wrapper">
   <div class="project-grid">
     {#each data.projects as project}

@@ -1,6 +1,8 @@
 <div>
   <span>
-    © 3D Sound FX 2025 | <a href="mailto:admin@3dsoundfx.com">admin@3dsoundfx.com</a> | ABN 57 464 019 656
+    <div class='small'>
+      © 3D Sound FX 2025 | <a href="mailto:admin@3dsoundfx.com">admin@3dsoundfx.com</a> | ABN 57 464 019 656
+    </div>
   </span>
 </div>
 
@@ -15,5 +17,8 @@
   }
   span {
     color: oklch(.985 0 0);
+  }
+  .small {
+    font-size: var(--fs-small);
   }
 </style>

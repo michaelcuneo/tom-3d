@@ -4,7 +4,7 @@
 
 <a class="project-card" href={link} style="background-image: url('{image}');">
   <div class="overlay">
-    <h2>{title}</h2>
+    <h3>{title}</h3>
     <p>{description}</p>
   </div>
 </a>
@@ -40,7 +40,7 @@
     transition: background 200ms ease;
   }
 
-  h2 {
+  h3 {
     margin-bottom: 0.75rem;
   }
 

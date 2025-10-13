@@ -6,7 +6,7 @@
 <Lander header="3D Sound FX" subheader="CLASSICAL MUSIC LOCATION RECORDING" image={image} position="bottom" />
 <div class="page-content">
   <section class="intro">
-    <h1>Location Recording</h1>
+    <h2>Location Recording</h2>
     <p>Professionally recorded ambiences using custom outdoor recording systems for surround and immersive formats. Ideal for use in film, games, installations, and spatial audio projects.</p>
   </section>
 </div>
@@ -19,7 +19,7 @@
     font-family: 'Inter', sans-serif;
     color: oklch(0.2 0.02 260);
   }
-  .intro h1 {
+  .intro h2 {
     margin-bottom: 1rem;
     text-align: center;
   }

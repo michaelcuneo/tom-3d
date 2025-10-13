@@ -1,5 +1,17 @@
 <script lang="ts">
-  let { header, subheader, image, position }: { header: string, subheader: string, image: string, position: string } = $props();
+  let {
+    header,
+    subheader,
+    image,
+    position,
+    updated
+  }: {
+    header: string,
+    subheader: string,
+    image: string,
+    position: string
+    updated?: Date
+  } = $props();
 
   import Stacco from '$lib/assets/stacco.jpeg';
 
@@ -12,6 +24,9 @@
   <section>
     <span class="head animate-fade">{header}</span>
     <span class="sub animate-rise">{subheader}</span>
+    {#if updated}
+      <div class="small">updated: {updated?.toLocaleDateString()}</div>
+    {/if}
   </section>
 </div>
 
@@ -52,13 +67,12 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    text-align: center;
     width: 100vw;
     height: 45vh;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    padding: 0 1rem;
+    padding: 0;
     animation: fadeInUp 300ms ease-out;
   }
 
@@ -77,6 +91,13 @@
     gap: 1rem;
     width: 50vw;
     z-index: 1;
+  }
+
+  .small {
+    font-size: 0.75rem;
+    color: oklch(.7 .02 285);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
   }
 
   .head {
