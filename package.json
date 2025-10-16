@@ -14,11 +14,13 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@aws-sdk/client-sesv2": "^3.908.0",
     "@eslint/compat": "^1.4.0",
     "@eslint/js": "^9.36.0",
     "@fontsource/changa-one": "^5.2.8",
     "@fontsource/roboto": "^5.2.8",
     "@lucide/svelte": "^0.545.0",
+    "@openauthjs/openauth": "^0.4.3",
     "@sveltejs/adapter-auto": "^6.1.0",
     "@sveltejs/kit": "^2.43.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.0",
@@ -41,6 +43,7 @@
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.44.1",
+    "valibot": "^1.1.0",
     "vite": "^7.1.7"
   },
   "dependencies": {

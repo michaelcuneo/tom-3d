@@ -48,7 +48,8 @@
 		background-blend-mode: normal, overlay;
 		background-position: center center;
 		background-size: auto, auto, cover;
-		background-image: radial-gradient(
+		background-image:
+			radial-gradient(
 				circle 16vmax at var(--cursorX2) var(--cursorY2),
 				rgba(0, 0, 0, 0.1) 30%,
 				rgba(0, 5, 5, 0.1) 40%,
@@ -78,7 +79,8 @@
 		61%,
 		62%,
 		100% {
-			background-image: radial-gradient(
+			background-image:
+				radial-gradient(
 					circle 16vmax at var(--cursorX2) var(--cursorY2),
 					rgba(0, 0, 0, 0.1) 30%,
 					rgba(0, 5, 5, 0.1) 40%,
