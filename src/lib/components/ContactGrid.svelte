@@ -5,7 +5,7 @@
   const contactItems = [
     {
       icon: MapPin,
-      title: 'Address',
+      title: 'Location',
       lines: [{
         type: 'string',
         string: 'Newcastle, Australia.'
@@ -67,26 +67,30 @@
     }
   }
 
-  .contact-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1px;
-    border: 1px solid black;
-    background: black;
-    animation: fadeInUp 500ms ease-in-out both;
-  }
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem; /* adds space between boxes */
+  background: oklch(0.98 0.01 260); /* a soft contrast */
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+  animation: fadeInUp 500ms ease-in-out both;
+  padding: 1rem;
+}
 
-  .contact-box {
-    background: white;
-    padding: 2rem;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: oklch(0.2 0.02 260);
-    transition: padding 300ms ease;
-  }
+.contact-box {
+  background: white;
+  padding: 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: oklch(0.2 0.02 260);
+  transition: padding 300ms ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06); /* soft shadow for separation */
+  border-radius: 0.75rem; /* smooth corners */
+}
 
   h2 {
     margin: 1rem 0 0.5rem;
@@ -107,7 +111,7 @@
 
   @media (max-width: 600px) {
     .contact-grid {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
     }
     .contact-box {
       padding: 1.5rem;

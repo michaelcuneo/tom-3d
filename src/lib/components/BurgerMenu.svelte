@@ -1,135 +1,159 @@
 <script lang="ts">
-  import { afterNavigate } from '$app/navigation';
+	import BurgerLink from './BurgerLink.svelte';
+	import { page } from '$app/state';
 
-  let open = $state(false);
-  let menuEl: HTMLElement;
+	let svg: SVGSVGElement;
+	let slide: HTMLDivElement;
+	let isOpen = false;
 
-  // lock scroll + trap focus when open
-  $effect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-      menuEl?.querySelector('a')?.focus();
-    } else {
-      document.body.style.overflow = '';
-    }
-  });
+	const handleKeyDown = (event: KeyboardEvent) => {
+		if (event.key === 'Enter' || event.key === ' ') {
+			handleClick();
+		}
+	};
+	const handleKeyUp = (event: KeyboardEvent) => {
+		if (event.key === 'Enter' || event.key === ' ') {
+			handleClick();
+		}
+	};
 
-  function trapFocus(e: KeyboardEvent) {
-    if (e.key !== 'Tab') return;
-    const focusables = [...menuEl.querySelectorAll('a')];
-    const first = focusables[0];
-    const last = focusables[focusables.length - 1];
-
-    if (e.shiftKey && document.activeElement === first) {
-      e.preventDefault();
-      (last as HTMLElement)?.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault();
-      (first as HTMLElement)?.focus();
-    }
-  }
+	const handleClick = () => {
+		isOpen = !isOpen;
+	};
 </script>
 
-<!-- Burger -->
-<button class="burger" aria-label="Toggle menu" onclick={() => open = !open}>
-  <div class:open-bar={open}></div>
-  <div class:open-bar={open}></div>
-  <div class:open-bar={open}></div>
-</button>
+<div class="menu">
+	<svg
+		bind:this={svg}
+		role="button"
+		aria-label="Menu"
+		tabindex="0"
+		class:active={isOpen}
+		class="ham hamRotate ham4"
+		viewBox="0 0 100 100"
+		width="80"
+		onclick={handleClick}
+		onkeypress={handleKeyDown}
+		onkeyup={handleKeyUp}
+		aria-expanded={isOpen}
+		aria-controls="menu"
+		aria-haspopup="true"
+		aria-pressed={isOpen ? 'true' : 'false'}
+		aria-labelledby="menu"
+		aria-describedby="menu"
+	>
+		<path
+			class="line top"
+			d="m 70,33 h -40 c 0,0 -8.5,-0.149796 -8.5,8.5 0,8.649796 8.5,8.5 8.5,8.5 h 20 v -20"
+		/>
+		<path class="line middle" d="m 70,50 h -40" />
+		<path
+			class="line bottom"
+			d="m 30,67 h 40 c 0,0 8.5,0.149796 8.5,-8.5 0,-8.649796 -8.5,-8.5 -8.5,-8.5 h -20 v 20"
+		/>
+	</svg>
+</div>
 
-<!-- Sliding Menu -->
-<aside
-  class="menu {open ? 'menu-open' : ''}"
-  bind:this={menuEl}
-  aria-hidden={!open}
-  tabindex="-1"
-  onkeydown={trapFocus}
->
-  <nav>
-    <ul>
-      <li><a href="/" onclick={() => open = false}>Home</a></li>
-      <li><a href="/field-recording" onclick={() => open = false}>Field Recording</a></li>
-      <li><a href="/location-recording" onclick={() => open = false}>Location Recording</a></li>
-      <li><a href="/projects" onclick={() => open = false}>Projects</a></li>
-      <li><a href="/contact" onclick={() => open = false}>Contact</a></li>
-    </ul>
-  </nav>
-</aside>
+<button
+	class="backdrop"
+	class:visible={isOpen}
+	onclick={() => (isOpen = false)}
+	onkeydown={(event) => {
+		if (event.key === 'Enter' || event.key === ' ') {
+			isOpen = false;
+		}
+	}}
+	aria-label="Close menu"
+></button>
+
+<div class="slide" bind:this={slide} class:open={isOpen}>
+	<ul class="nav">
+		<li>
+			<BurgerLink href="/" icon="home" label="Home" description="Return to the homepage" bind:isOpen />
+		</li>
+		<li>
+			<BurgerLink href="/field-recording" icon="grass" label="Field Recording" description="Recording in the wild." bind:isOpen />
+		</li>
+		<li>
+			<BurgerLink href="/location-recording" icon="mic" label="Location Recording" description="Recording in the studio." bind:isOpen />
+		</li>
+		<li>
+			<BurgerLink href="/projects" icon="workspaces" label="Projects" description="Current Projects" bind:isOpen />
+		</li>
+		<li>
+			<BurgerLink href="/contact" icon="touch_app" label="Contact" description="Work with me" bind:isOpen />
+		</li>
+	</ul>
+</div>
 
 <style>
-  .burger {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 999;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    width: 32px;
-    height: 32px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-  }
-
-  .burger div {
-    width: 100%;
-    height: 3px;
-    background: var(--text-light);
-    transition: transform 200ms ease, opacity 200ms ease;
-  }
-
-  .burger div.open-bar:nth-child(1) {
-    transform: rotate(45deg) translate(4px, 4px);
-  }
-
-  .burger div.open-bar:nth-child(2) {
-    opacity: 0;
-  }
-
-  .burger div.open-bar:nth-child(3) {
-    transform: rotate(-45deg) translate(5px, -5px);
-  }
-
-  .menu {
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 100vh;
-    width: 100vw;
-    background: oklch(0.12 0.02 285);
-    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.2);
-    transform: translateX(100%);
-    transition: transform 300ms ease-out;
-    padding: 2rem;
-    z-index: 998;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    outline: none;
-  }
-
-  .menu.menu-open {
-    transform: translateX(0);
-  }
-
-  nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  nav a {
-    color: var(--text-light);
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: color 150ms;
-  }
-
-  nav a:hover {
-    color: var(--accent);
-  }
+	.menu {
+		position: fixed;
+		z-index: 100;
+	}
+	.ham {
+		cursor: pointer;
+		outline: none;
+		width: 4rem;
+		height: 4rem;
+	}
+	.backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 98;
+		background-color: oklch(0.2 0.02 260);
+		backdrop-filter: blur(0px);
+		opacity: 0;
+		pointer-events: none;
+		transition:
+			backdrop-filter 0.3s ease,
+			background-color 0.3s ease,
+			opacity 0.3s ease;
+		will-change: backdrop-filter, opacity;
+	}
+	.backdrop.visible {
+		background-color: rgba(0, 0, 0, 0.3);
+		backdrop-filter: blur(5px);
+		opacity: 1;
+		pointer-events: auto;
+	}
+	.slide {
+		position: fixed;
+		top: 0;
+		right: 0;
+		width: 100vw;
+		height: 100vh;
+		background-color: oklch(0.2 0.02 260);
+		z-index: 99;
+		transform: translateX(100%);
+		transition: transform 0.3s ease-in-out;
+		box-shadow: -4px 0 8px rgba(0, 0, 0, 0.3);
+		overflow-y: auto;
+	}
+	@media (min-width: 768px) {
+		.slide {
+			width: 100vw;
+			max-width: 100vw;
+		}
+	}
+	@media (max-width: 768px) {
+		.menu {
+			top: 0.3rem; /* Adjust for smaller screens */
+			right: 0.3rem; /* Adjust for smaller screens */
+		}
+		.slide {
+			width: 100vw;
+			max-width: 100vw;
+		}
+	}
+	.slide.open {
+		transform: translateX(0%);
+	}
+	.nav {
+		list-style: none;
+		padding-top: 5.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
 </style>

@@ -14,19 +14,26 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.911.0",
+    "@aws-sdk/client-s3": "^3.913.0",
     "@aws-sdk/client-sesv2": "^3.908.0",
+    "@aws-sdk/lib-dynamodb": "^3.911.0",
+    "@aws-sdk/s3-request-presigner": "^3.913.0",
     "@eslint/compat": "^1.4.0",
     "@eslint/js": "^9.36.0",
     "@fontsource/changa-one": "^5.2.8",
+    "@fontsource/material-icons": "^5.2.7",
     "@fontsource/roboto": "^5.2.8",
     "@lucide/svelte": "^0.545.0",
     "@openauthjs/openauth": "^0.4.3",
     "@sveltejs/adapter-auto": "^6.1.0",
+    "@sveltejs/adapter-node": "^5.4.0",
     "@sveltejs/kit": "^2.43.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.0",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.18",
     "@tailwindcss/vite": "^4.1.13",
+    "@types/aws-lambda": "^8.10.156",
     "@types/node": "^22",
     "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",
@@ -40,6 +47,7 @@
     "sanitize.css": "^13.0.0",
     "svelte": "^5.39.5",
     "svelte-check": "^4.3.2",
+    "svelte-kit-sst": "^2.43.5",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.44.1",
@@ -47,7 +55,6 @@
     "vite": "^7.1.7"
   },
   "dependencies": {
-    "sst": "3.17.14",
-    "svelte-kit-sst": "2.43.5"
+    "sst": "3.17.14"
   }
 }

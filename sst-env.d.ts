@@ -5,6 +5,35 @@
 
 declare module "sst" {
   export interface Resource {
+    "Emailer": {
+      "configSet": string
+      "sender": string
+      "type": "sst.aws.Email"
+    }
+    "ThomasAuth": {
+      "type": "sst.aws.Auth"
+      "url": string
+    }
+    "ThomasBucket": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
+    "ThomasProject": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
+    "ThomasProjectApi": {
+      "type": "sst.aws.ApiGatewayV2"
+      "url": string
+    }
+    "ThomasUser": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
+    "ThomasWeb": {
+      "type": "sst.aws.SvelteKit"
+      "url": string
+    }
   }
 }
 /// <reference path="sst-env.d.ts" />

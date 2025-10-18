@@ -2,7 +2,7 @@
 	<span>
 		<div class="small">
 			<ul>
-				<li>© 3D Sound FX 2025</li>
+				<li>© 3D Sound FX <a href="/auth/login">2025</a></li>
 				<li><a href="mailto:admin@3dsoundfx.com">admin@3dsoundfx.com</a></li>
 				<li>ABN 57 464 019 656</li>
 			</ul>
@@ -45,7 +45,6 @@
 		div {
 			min-height: auto;
 			height: auto;
-			font-size: var(--fs-small);
 			padding: 1rem 1rem;
 		}
 		ul {
@@ -54,5 +53,10 @@
 			gap: 0.5rem;
 			text-align: center;
 		}
+    li {
+      margin: 0;
+      font-size: var(--fs-small) !important;
+      font-weight: 200;
+    }
 	}
 </style>

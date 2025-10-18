@@ -12,7 +12,7 @@
 		<h2>Have a project in mind?</h2>
 
 		{#if submitted}
-			<p class="thank-you">Thanks for your message! I’ll get back to you soon.</p>
+			<p class="thank-you">Thanks for your message! I'll get back to you soon.</p>
 		{:else}
 			<form action="?/contact" method="POST" use:enhance>
 				<div class="row">
@@ -54,7 +54,7 @@
 		background: oklch(0.97 0 260);
 		border-radius: 1rem;
 		box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
-		font-family: 'Inter', sans-serif;
+		font-family: 'Roboto', sans-serif;
 		color: oklch(0.18 0.01 260);
 	}
 

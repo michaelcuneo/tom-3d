@@ -16,7 +16,7 @@
     max-width: 1000px;
     margin: 2rem auto;
     padding: 0 1rem;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Roboto', sans-serif;
     color: oklch(0.2 0.02 260);
   }
   .intro h2 {

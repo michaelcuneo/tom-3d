@@ -3,6 +3,7 @@
   import image from '$lib/assets/turntable.png';
 	import CTAGrid from "$lib/components/CTAGrid.svelte";
   import ContactGrid from "$lib/components/ContactGrid.svelte";
+	import Separator from "$lib/components/Separator.svelte";
 </script>
 
 <Lander header="3D Sound FX" subheader="Sound Recordings by Thomas Mitchell" image={image} position="center" />
@@ -16,6 +17,7 @@
   </section>
 </div>
 <CTAGrid />
+<Separator />
 <ContactGrid />
 
 <style>
@@ -23,7 +25,7 @@
     max-width: 1000px;
     margin: 2rem auto;
     padding: 0 1rem;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Roboto', sans-serif;
     color: oklch(0.2 0.02 260);
   }
   .intro h2 {

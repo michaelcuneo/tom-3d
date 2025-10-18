@@ -1,64 +1,80 @@
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad, Actions } from './$types';
+import { Resource } from 'sst';
 
-export const load: PageServerLoad = async () => {
-	const projects = [
-		{
-			title: 'Urban Ambience',
-			description: 'Capturing the raw sounds of the city in motion.',
-			link: '/projects/urban-ambience',
-			image: 'https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg'
-		},
-		{
-			title: 'Forest Layers',
-			description: 'An immersive nature-based recording project.',
-			link: '/projects/forest-layers',
-			image: 'https://images.pexels.com/photos/1098592/pexels-photo-1098592.jpeg'
-		},
-		{
-			title: 'Studio FX Design',
-			description: 'Experimental sound design in controlled spaces.',
-			link: '/projects/studio-fx',
-			image: 'https://images.pexels.com/photos/1649387/pexels-photo-1649387.jpeg'
-		},
-		{
-			title: 'Water Echoes',
-			description: 'Hydrophone recordings from lakes and rivers.',
-			link: '/projects/water-echoes',
-			image: 'https://images.pexels.com/photos/3552882/pexels-photo-3552882.jpeg'
-		},
-		{
-			title: 'Mountain Winds',
-			description: 'Field capture of alpine gusts and elevation tones.',
-			link: '/projects/mountain-winds',
-			image: 'https://images.pexels.com/photos/1323550/pexels-photo-1323550.jpeg'
-		},
-		{
-			title: 'Industrial Rhythms',
-			description: 'Mechanical and urban machinery percussion.',
-			link: '/projects/industrial-rhythms',
-			image: 'https://images.pexels.com/photos/209251/pexels-photo-209251.jpeg'
-		},
-		{
-			title: 'Cave Reverbs',
-			description: 'Sound reflections in underground chambers.',
-			link: '/projects/cave-reverbs',
-			image: 'https://images.pexels.com/photos/2251571/pexels-photo-2251571.jpeg'
-		},
-		{
-			title: 'Fire & Ember',
-			description: 'Crackling textures and heat shimmer ambiance.',
-			link: '/projects/fire-ember',
-			image: 'https://images.pexels.com/photos/2662116/pexels-photo-2662116.jpeg'
-		},
-		{
-			title: 'Ghost Signals',
-			description: 'Radio sweeps and lost transmissions.',
-			link: '/projects/ghost-signals',
-			image: 'https://images.pexels.com/photos/596132/pexels-photo-596132.jpeg'
-		}
-	];
+export const load: PageServerLoad = async ({ fetch, locals }) => {
+	const apiUrl = Resource.ThomasProjectApi.url + '/projects/list';
+	const projectsResponse = await fetch(apiUrl);
+
+	if (!projectsResponse.ok) {
+		throw new Error('Failed to fetch projects');
+	}
+
+	const projects = await projectsResponse.json();
+
+	// Adjust if your auth system differs
+	const isLoggedIn = !!locals.session;
 
 	return {
-		projects
+		projects,
+		isLoggedIn
 	};
+};
+
+export const actions: Actions = {
+	createProject: async ({ request }) => {
+		const data = await request.formData();
+
+		const title = data.get('title');
+		const description = data.get('description');
+		const imageKey = data.get('imageKey');
+
+		if (!title || !description) return { error: 'Project details required' };
+
+		const res = await fetch(Resource.ThomasProjectApi.url + '/project/create', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				title,
+				description,
+				imageKey
+			})
+		});
+
+		if (!res.ok) return { error: 'Failed to create project' };
+		return { success: true };
+	},
+
+	updateProject: async ({ request }) => {
+		const data = await request.formData();
+		const id = data.get('id');
+		const title = data.get('title');
+		const description = data.get('description');
+		const imageKey = data.get('imageKey');
+
+		if (!id || !title) return { error: 'Missing required fields' };
+
+		const res = await fetch(Resource.ThomasProjectApi.url + '/project/edit', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ id, title, description, imageKey })
+		});
+
+		if (!res.ok) return { error: 'Failed to update project' };
+		return { success: true };
+	},
+
+	deleteProject: async ({ request }) => {
+		const data = await request.formData();
+		const id = data.get('id');
+		if (!id) return { error: 'Missing project ID' };
+
+		const res = await fetch(Resource.ThomasProjectApi.url + '/project/delete', {
+			method: 'DELETE',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(id)
+		});
+
+		if (!res.ok) return { error: 'Failed to delete project' };
+		return { success: true };
+	}
 };

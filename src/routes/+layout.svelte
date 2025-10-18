@@ -5,6 +5,8 @@
 	import 'sanitize.css/typography.css';
 	import 'sanitize.css/assets.css';
 	import '@fontsource/changa-one';
+	import '@fontsource/material-icons';
+	import '@fontsource/roboto';
 
 	import '../app.css';
 	import Header from '$lib/components/Header.svelte';
@@ -30,6 +32,8 @@
 
 <style>
 	.root {
+		display: flex;
+		flex-direction: column;
 		min-height: 100%;
 		height: 100%;
 	}

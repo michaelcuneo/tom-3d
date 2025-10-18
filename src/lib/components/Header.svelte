@@ -1,11 +1,12 @@
 <script lang="ts">
-	import threedS from '$lib/assets/3Ds.svg';
-	import BurgerMenu from './BurgerMenu.svelte';
+  import ThreeDSFX from '$lib/assets/3DSoundFX_Logo.svg';
+  import ThreeDSFX_2 from '$lib/assets/3DSoundFX_Logo_2.svg';
+	import BurgerMenu from '$lib/components/BurgerMenu.svelte';
 </script>
 
 <header class="animated-header">
-	<img src={threedS} alt="3d-s logo" class="logo fade-up" />
-	<span class="heading fade-up delay-1">3D SOUND FX</span>
+	<img src={ThreeDSFX} alt="3d-s logo" class="logo fade-up" />
+  <img src={ThreeDSFX_2} alt="3d-s logo" class="mobile-logo fade-up delay-2" />
 	<hr class="divider fade-up delay-2" />
 
 	<!-- Desktop Nav -->
@@ -40,10 +41,6 @@
 		animation: fadeUp 250ms ease-out forwards;
 	}
 
-	.delay-1 {
-		animation-delay: 50ms;
-	}
-
 	.delay-2 {
 		animation-delay: 100ms;
 	}
@@ -57,7 +54,7 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 1rem;
-		height: 210px;
+		height: 190px;
 		background-color: oklch(0.141 0.005 285.823);
 		animation: fadeUp 250ms ease-out;
 		position: relative;
@@ -70,15 +67,12 @@
 
 	.logo {
 		height: 95px;
-		margin: 0;
+		margin: 1rem 0rem 0rem 0rem;
 		padding: 0;
 	}
-
-	.heading {
-		color: oklch(0.967 0.001 286.375);
-		font-family: 'Changa One', sans-serif;
-		margin: 0;
-	}
+  .mobile-logo {
+    display: none;
+  }
 
 	.divider {
 		width: 100%;
@@ -91,7 +85,7 @@
 	ul.desktop-nav {
 		display: flex;
 		gap: 4rem;
-		height: 80px;
+		height: 45px;
 		list-style: none;
 		text-transform: uppercase;
 		font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
@@ -120,14 +114,19 @@
 
 	@media (max-width: 1024px) {
 		.animated-header {
+      min-height: 72px;
+      height: 190px;
 			flex-direction: row;
 			align-items: center;
-			height: auto;
 		}
 		.logo {
-			height: 35px;
-			margin: 1rem 1rem 1rem 1rem;
+      display: none;
 		}
+    .mobile-logo {
+      display: block;
+      margin: 1.2rem;
+      height: 25px;
+    }
 		hr {
 			display: none;
 		}
@@ -136,9 +135,6 @@
 		}
 		.mobile-nav {
 			display: block;
-			position: absolute;
-			top: 1rem;
-			right: 1rem;
 		}
 	}
 </style>

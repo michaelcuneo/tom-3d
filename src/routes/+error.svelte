@@ -31,7 +31,7 @@
     align-items: center;
     justify-content: center;
     background: oklch(0.97 0 260);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Roboto', sans-serif;
     animation: fadeInUp 400ms ease-out;
   }
 

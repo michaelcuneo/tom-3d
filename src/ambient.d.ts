@@ -6,3 +6,8 @@ type Project = {
 };
 
 type Projects = Project[];
+
+type FileArray = {
+	name: string;
+	src: string;
+};
