@@ -2,7 +2,6 @@
 	import Lander from "$lib/components/Lander.svelte";
   import image from '$lib/assets/concerthall.jpeg';
 	import Button from "$lib/components/Button.svelte";
-	import { goto } from "$app/navigation";
 </script>
 
 <Lander header="3D Sound FX" subheader="CLASSICAL MUSIC LOCATION RECORDING" image={image} position="bottom" />
@@ -10,7 +9,7 @@
   <section class="intro">
     <h2>Location Recording</h2>
     <p>Professionally recorded ambiences using custom outdoor recording systems for surround and immersive formats. Ideal for use in film, games, installations, and spatial audio projects.</p>
-    <Button label="Get in Touch" onclick={() => goto('/')} />
+    <Button label="Download Sound Samples" onclick={() => window.location.href="https://drive.google.com/drive/folders/1bg2se31sRPcshj5QOyNQsp1NJocCovi3?usp=share_link"} />
   </section>
 </div>
 

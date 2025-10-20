@@ -10,7 +10,7 @@
   <section class="intro">
     <h2>Field Recording</h2>
     <p>Professionally recorded ambiences using custom outdoor recording systems for surround and immersive formats. Ideal for use in film, games, installations, and spatial audio projects. </p>
-    <Button label="Get in Touch" onclick={() => goto('/')} />
+    <Button label="Download Sound Samples" onclick={() => window.location.href="https://drive.google.com/drive/folders/1bg2se31sRPcshj5QOyNQsp1NJocCovi3?usp=share_link"} />
   </section>
 </div>
 
