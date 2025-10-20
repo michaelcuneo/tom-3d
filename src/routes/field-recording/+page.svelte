@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Lander from "$lib/components/Lander.svelte";
   import image from '$lib/assets/fieldrecording.jpg';
+  import Button from "$lib/components/Button.svelte";
+  import { goto } from "$app/navigation";
 </script>
 
 <Lander header="3D Sound FX" subheader="Ambiences for Film and Media" image={image} position="middle" />
@@ -8,6 +10,7 @@
   <section class="intro">
     <h2>Field Recording</h2>
     <p>Professionally recorded ambiences using custom outdoor recording systems for surround and immersive formats. Ideal for use in film, games, installations, and spatial audio projects. </p>
+    <Button label="Get in Touch" onclick={() => goto('/')} />
   </section>
 </div>
 

@@ -2,7 +2,7 @@
 	<span>
 		<div class="small">
 			<ul>
-				<li>© 3D Sound FX <a href="/auth/login">2025</a></li>
+				<li><a href="/auth/login">©</a> 3D Sound FX 2025</li>
 				<li><a href="mailto:admin@3dsoundfx.com">admin@3dsoundfx.com</a></li>
 				<li>ABN 57 464 019 656</li>
 			</ul>
@@ -17,7 +17,6 @@
 		align-items: center;
 		min-height: 3rem;
 		background-color: oklch(21% 0.034 264.665);
-		font-family: 'Roboto', sans-serif;
 	}
 	span {
 		color: oklch(0.985 0 0);
@@ -25,10 +24,15 @@
 	ul {
 		display: flex;
 		list-style: none;
-		font-size: var(--fs-small) !important;
 		gap: 1.5rem;
 		padding: 0;
 		margin: 0;
+	}
+	li {
+		margin: 0;
+		font-family: 'Roboto', sans-serif;
+		font-size: var(--fs-small);
+		font-weight: 200;
 	}
 	a {
 		color: oklch(0.985 0 0);

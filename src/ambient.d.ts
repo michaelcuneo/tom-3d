@@ -1,13 +1,18 @@
 type Project = {
+	projectId: string;
 	title: string;
 	description: string;
-	link: string;
-	image: string;
+	featuredImage?: string | null;
+	featuredImageUrl?: string | null;
+	updatedAt: AWSDateTime;
+	createdAt: AWSDateTime;
+};
+
+type User = {
+	id: string;
+	email: string;
+	createdAt: AWSDateTime;
+	updatedAt: AWSDateTime;
 };
 
 type Projects = Project[];
-
-type FileArray = {
-	name: string;
-	src: string;
-};

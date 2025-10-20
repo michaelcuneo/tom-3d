@@ -1,13 +1,14 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import FileDropper from '$lib/components/FileDropper.svelte';
+  import { selectedProject } from '$lib/utils/state';
 
   let createForm: HTMLFormElement | null = $state(null);
   let hiddenFileInput: HTMLInputElement | null = $state(null);
-
-  let title = $state();
-  let description = $state();
+  let title = $state($selectedProject?.title || '');
+  let description = $state($selectedProject?.description || '');
   let file: File | null = $state(null);
+  let existingImageUrl: string = $state($selectedProject?.featuredImage || '');
 
   let {
     onclickClose = () => {}
@@ -52,7 +53,7 @@
         <textarea bind:value={description} required></textarea>
       </label>
 
-      <FileDropper bind:file previewUrl={undefined} />
+      <FileDropper bind:file previewUrl={existingImageUrl} />
 
       <button type="submit">Save</button>
     </form>

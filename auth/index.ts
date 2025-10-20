@@ -12,8 +12,9 @@ import type { Theme } from '@openauthjs/openauth/ui/theme';
 const MY_THEME: Theme = {
 	primary: '#4A90E2',
 	title: '3D Sound FX',
-	radius: 'none',
-	favicon: 'https://www.example.com/favicon.svg'
+	radius: 'md',
+	logo: 'https://halide.michaelcuneo.com.au/misc/mc.svg',
+	favicon: 'https://halide.michaelcuneo.com.au/misc/mc.svg'
 };
 
 async function getUser(email: string) {

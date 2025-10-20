@@ -1,50 +1,43 @@
 <script lang="ts">
-  let {
-    title = '',
+  import { SquarePen, Delete } from '@lucide/svelte';
+
+  let { title = '',
     description = '',
-    image = '',
+    imageUrl = '',
     isAddCard = false,
-    isLoggedIn = $bindable(false),
-    onAdd,
-    onEdit,
-    onDelete
+    isLoggedIn = false,
+    onclick = () => {},
+    onclickEdit = () => {},
+    onclickDelete = () => {}
   }: {
     title?: string;
     description?: string;
-    image?: string;
+    imageUrl?: string;
     isAddCard?: boolean;
     isLoggedIn?: boolean;
-    onAdd?(): void;
-    onEdit?(): void;
-    onDelete?(): void;
+    onclick?(): void;
+    onclickEdit?(): void;
+    onclickDelete?(): void;
   } = $props();
 </script>
 
 {#if isAddCard}
-  <button
-    class="project-card add-card"
-    onclick={onAdd}
-    aria-label="Add Project"
-  >
+  <button class="project-card add-card" onclick={onclick}>
     <div class="overlay centered">
       <h3>+ Add Project</h3>
     </div>
   </button>
 {:else}
   <div class="project-card-wrapper">
-    <!-- Change to an anchor one day in the future-->
-    <div
-      class="project-card"
-      style="background-image: url('{image}')"
-    >
+    <div class="project-card" style={`background-image: url("${imageUrl}");`}>
       <div class="overlay">
-        <h3>{isAddCard ? 'Add Project' : title}</h3>
+        <h3>{title}</h3>
         <p>{description}</p>
       </div>
       {#if isLoggedIn}
         <div class="card-actions">
-          <button class="edit-btn" aria-label="Edit Project" onclick={onEdit}>✎</button>
-          <button class="delete-btn" aria-label="Delete Project" onclick={onDelete}>🗑</button>
+          <button class="edit-btn" onclick={onclickEdit}><SquarePen size="28px" /></button>
+          <button class="delete-btn" onclick={onclickDelete}><Delete size="24px" /></button>
         </div>
       {/if}
     </div>
@@ -105,11 +98,6 @@
     align-items: flex-end;
     text-decoration: none;
     transition: transform 200ms ease, box-shadow 200ms ease;
-  }
-
-  .project-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
   }
 
   .add-card {

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { MapPin, Phone, Mail } from '@lucide/svelte';
-	import { stringify } from 'querystring';
 
   const contactItems = [
     {

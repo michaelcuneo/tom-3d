@@ -60,8 +60,8 @@ export default $config({
 		ThomasProjectApi.route('GET /user/get/{email}', './api/users.getUser');
 		ThomasProjectApi.route('POST /user/create', './api/users.createUser');
 		ThomasProjectApi.route('DELETE /user/delete/{email}', './api/users.deleteUser');
-		ThomasProjectApi.route('PUT /user/update', './packages/functions/src/users.updateUser');
-		ThomasProjectApi.route('DELETE /user/delete', './packages/functions/src/users.deleteUser');
+		ThomasProjectApi.route('PUT /user/update', './api/users.updateUser');
+		ThomasProjectApi.route('DELETE /user/delete', './api/users.deleteUser');
 
 		const ThomasAuth = new sst.aws.Auth('ThomasAuth', {
 			issuer: {

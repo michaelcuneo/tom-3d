@@ -1,76 +1,71 @@
 <script lang="ts">
+  import { enhance } from '$app/forms';
+  import { selectedProject } from '$lib/utils/state';
+
   import Lander from '$lib/components/Lander.svelte';
-  import ProjectCard from '$lib/components/ProjectCard.svelte';
+  import ProjectCard from './ProjectCard.svelte';
   import AddProject from './AddProject.svelte';
-
-  let showModal = $state(false);
-  let time = new Date();
-
-  let title: string = $state('');
-  let description: string = $state('');
-  let image: string = $state("");
-  let form: HTMLFormElement | null = $state(null);
-
-  const submitProject = (e: any) => {
-    if (form) {
-      form.requestSubmit();
-    }
-  };
+  import EditProject from './EditProject.svelte';
+	import AddProjectCard from './AddProjectCard.svelte';
+	import DeleteProject from './DeleteProject.svelte';
+  
+  let showAddModal = $state(false);
+  let showEditModal = $state(false);
+  let showDeleteModal = $state(false);
 
   let { data }: { data: { projects: any[]; isLoggedIn: boolean } } = $props();
 
+  function openAddModal() {
+    selectedProject.set(null);
+    showAddModal = true;
+  }
+
   function openEditModal(project: Project) {
-    showModal = true;
-    title = project.title;
-    description = project.description;
-    image = project.image;
+    selectedProject.set(project);
+    showEditModal = true;
+  }
+
+  function openDeleteModal(project: Project) {
+    selectedProject.set(project);
+    showDeleteModal = true;
   }
 </script>
 
-<Lander header="3D Sound FX" subheader="Recent Projects" image="" position="center" updated={time} />
+<Lander header="3D Sound FX" subheader="Recent Projects" image="" position="center" updated={new Date()} />
 
 <section class="projects-wrapper">
   <div class="project-grid">
     {#if data.isLoggedIn}
-      <ProjectCard
-        isAddCard
-        onAdd={() => {
-          title = '';
-          description = '';
-          image = '';
-          showModal = true;
-        }}
-      />
+      <AddProjectCard onclick={openAddModal} />
     {/if}
     {#each data.projects as project (project.projectId)}
       <ProjectCard
         title={project.title}
         description={project.description}
-        image={project.image}
+        imageUrl={project.featuredImageUrl}
         isLoggedIn={data.isLoggedIn}
-        onEdit={() => openEditModal(project)}
-        onDelete={() => console.log('Delete', project)}
+        onclickEdit={() => openEditModal(project)}
+        onclickDelete={() => openDeleteModal(project)}
       />
     {/each}
   </div>
 </section>
 
-<form bind:this={form} style="display: none;" method="POST" action="?/createProject">
-  <input type="hidden" name="title" value={title} />
-  <input type="hidden" name="description" value={description} />
-  <input type="hidden" name="image" value={image} />
-</form>
-
-{#if showModal}
+{#if showAddModal}
   <AddProject
-    title={title}
-    description={description}
-    image={image}
-    onSubmit={(e) => {
-      submitProject(e);
-      showModal = false;
-    }}
-    onClose={() => showModal = false}
+    onclickClose={() => (showAddModal = false)}
+  />
+{/if}
+
+{#if showEditModal}
+  <EditProject
+    onclickClose={() => (showEditModal = false)}
+  />
+{/if}
+
+{#if showDeleteModal}
+  <DeleteProject
+    onclickClose={() => (showDeleteModal = false)}
   />
 {/if}
 
@@ -82,7 +77,6 @@
     font-family: 'Inter', sans-serif;
     color: oklch(0.97 0 260);
   }
-
   .project-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

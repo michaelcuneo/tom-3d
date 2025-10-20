@@ -37,13 +37,15 @@ export const listProjects: APIGatewayProxyHandlerV2 = async () => {
 export const createProject: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEventV2) => {
 	const body = JSON.parse(event?.body || '');
 
+	console.log('createProject body:', body);
+
 	const params = {
 		TableName: Resource.ThomasProject.name,
 		Item: {
 			projectId: uuidv4(), // Generate a unique ID
 			title: body.title,
 			description: body.description,
-			featuredImage: body.featuredImage || null,
+			featuredImage: body.imageKey || null,
 			createdAt: Date.now(),
 			updatedAt: Date.now()
 		}
