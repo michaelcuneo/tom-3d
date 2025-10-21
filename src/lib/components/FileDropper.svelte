@@ -3,11 +3,13 @@
     file = $bindable<File | null>(null),
     variant = 'standard',
     label = `file-dropper-label-${Math.random().toString(36).substring(2, 15)}`,
+    onremove = () => {},
     previewUrl = ''
   }: {
     file?: File | null;
     variant?: 'standard' | 'neumorphic';
     label?: string;
+    onremove?(): void;
     previewUrl?: string;
   } = $props();
 
@@ -76,6 +78,7 @@
   const clearFile = () => {
     file = null;
     internalPreviewUrl = null;
+    onremove();
   };
 </script>
 

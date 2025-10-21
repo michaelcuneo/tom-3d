@@ -71,7 +71,14 @@
           <textarea bind:value={description} required></textarea>
         </label>
 
-        <FileDropper bind:file previewUrl={existingImageUrl} />
+        <FileDropper
+          bind:file
+          previewUrl={existingImageUrl}
+          onremove={() => {
+            file = null;
+            existingImageUrl = '';
+           }}
+        />
 
         <button type="submit">Save</button>
       </form>

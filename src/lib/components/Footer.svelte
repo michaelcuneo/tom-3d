@@ -1,8 +1,13 @@
+<script lang="ts">
+	let { isLoggedIn }: { isLoggedIn?: boolean } = $props();
+	$inspect(isLoggedIn, 'props');
+</script>
+
 <div>
 	<span>
 		<div class="small">
 			<ul>
-				<li><a href="/auth/login">©</a> 3D Sound FX 2025</li>
+				<li><a href={!isLoggedIn ? "/auth/login" : "/auth/logout"}>©</a> 3D Sound FX 2025</li>
 				<li><a href="mailto:admin@3dsoundfx.com">admin@3dsoundfx.com</a></li>
 				<li>ABN 57 464 019 656</li>
 			</ul>

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
+
 	import 'reset.css';
 	import 'sanitize.css';
 	import 'sanitize.css/forms.css';
@@ -14,7 +16,17 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import Overlay from '$lib/components/Overlay.svelte';
 
-	let { children } = $props();
+	let {
+		children,
+		data
+	}: {
+		children?: Snippet;
+		data?: {
+			isLoggedIn: boolean;
+		};
+	} = $props();
+
+	$inspect(data);
 </script>
 
 <svelte:head>
@@ -27,7 +39,7 @@
 	<div class="main">
 		{@render children?.()}
 	</div>
-	<Footer />
+	<Footer isLoggedIn={data?.isLoggedIn} />
 </div>
 
 <style>
