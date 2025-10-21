@@ -20,7 +20,6 @@ const MY_THEME: Theme = {
 async function getUser(email: string) {
 	// Get user from database and return user ID
 	const url = Resource.ThomasProjectApi.url + '/user/get/' + email;
-	console.log('Fetching user from URL:', url);
 	const userResponse = await fetch(url);
 	const user = await userResponse.json();
 
@@ -65,9 +64,6 @@ const app = issuer({
 	},
 	success: async (ctx, value) => {
 		if (value.provider === 'code') {
-			console.log('Code provider success:', value.claims.email);
-			const user = await getUser(value.claims.email);
-			console.log('Authenticated user ID:', user);
 			return ctx.subject('user', {
 				id: await getUser(value.claims.email)
 			});

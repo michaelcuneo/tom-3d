@@ -1,14 +1,17 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+  import Loader from '$lib/components/Loader.svelte';
   import FileDropper from '$lib/components/FileDropper.svelte';
   import { selectedProject } from '$lib/utils/state';
 
-  let createForm: HTMLFormElement | null = $state(null);
+  let updateForm: HTMLFormElement | null = $state(null);
   let hiddenFileInput: HTMLInputElement | null = $state(null);
+  let id = $state($selectedProject?.projectId || '');
   let title = $state($selectedProject?.title || '');
   let description = $state($selectedProject?.description || '');
   let file: File | null = $state(null);
-  let existingImageUrl: string = $state($selectedProject?.featuredImage || '');
+  let existingImageUrl: string = $state($selectedProject?.featuredImageUrl || '');
+  let submitting = $state(false);
 
   let {
     onclickClose = () => {}
@@ -18,12 +21,23 @@
 
   function submit(event: Event) {
     event.preventDefault();
-    createForm?.requestSubmit();
+    updateForm?.requestSubmit();
   }
 
   function close() {
     onclickClose();
   }
+
+  const enhancement = async () => {
+    submitting = true;
+    return async ({ update }: { update: () => Promise<void> }) => {
+      await update().then(() => {
+        submitting = false;
+        close();
+      });
+    };
+  };
+
 
   $effect(() => {
     if (file && hiddenFileInput) {
@@ -39,30 +53,37 @@
 <div class="modal-backdrop">
   <div class="modal-content">
     <header>
-      <h2>Add Project</h2>
+      <h2>Edit Project</h2>
       <button class="close-btn" onclick={close}>×</button>
     </header>
 
-    <form onsubmit={submit}>
-      <label>
-        Title
-        <input type="text" bind:value={title} required />
-      </label>
-      <label>
-        Description
-        <textarea bind:value={description} required></textarea>
-      </label>
+    {#if submitting}
+      <Loader label="Updating Project..." />
+    {:else}
 
-      <FileDropper bind:file previewUrl={existingImageUrl} />
+      <form onsubmit={submit}>
+        <label>
+          Title
+          <input type="text" bind:value={title} required />
+        </label>
+        <label>
+          Description
+          <textarea bind:value={description} required></textarea>
+        </label>
 
-      <button type="submit">Save</button>
-    </form>
+        <FileDropper bind:file previewUrl={existingImageUrl} />
+
+        <button type="submit">Save</button>
+      </form>
+    {/if}
   </div>
 </div>
 
-<form bind:this={createForm} method="POST" enctype="multipart/form-data" action="?/createProject" use:enhance>
+<form bind:this={updateForm} method="POST" enctype="multipart/form-data" action="?/updateProject" use:enhance={enhancement}>
+  <input type="text" name="id" value={id} />
   <input type="text" name="title" value={title} />
   <input type="text" name="description" value={description} />
+  <input type="text" name="existingKey" value={$selectedProject?.featuredImage || ''} />
   <input type="file" name="file" bind:this={hiddenFileInput} style="display: none;" />
 </form>
 

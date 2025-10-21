@@ -1,12 +1,14 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
+  import { enhance, applyAction } from '$app/forms';
   import FileDropper from '$lib/components/FileDropper.svelte';
+	import Loader from '$lib/components/Loader.svelte';
 
   let createForm: HTMLFormElement | null = $state(null);
   let hiddenFileInput: HTMLInputElement | null = $state(null);
 
   let title = $state();
   let description = $state();
+  let submitting = $state(false);
   let file: File | null = $state(null);
 
   let {
@@ -23,6 +25,16 @@
   function close() {
     onclickClose();
   }
+
+  const enhancement = async () => {
+    submitting = true;
+    return async ({ update }: { update: () => Promise<void> }) => {
+      await update().then(() => {
+        submitting = false;
+        close();
+      });
+    };
+  };
 
   $effect(() => {
     if (file && hiddenFileInput) {
@@ -42,24 +54,28 @@
       <button class="close-btn" onclick={close}>×</button>
     </header>
 
-    <form onsubmit={submit}>
-      <label>
-        Title
-        <input type="text" bind:value={title} required />
-      </label>
-      <label>
-        Description
-        <textarea bind:value={description} required></textarea>
-      </label>
+    {#if submitting}
+      <Loader label="Creating Project..." />
+    {:else}
+      <form onsubmit={submit}>
+        <label>
+          Title
+          <input type="text" bind:value={title} required />
+        </label>
+        <label>
+          Description
+          <textarea bind:value={description} required></textarea>
+        </label>
 
-      <FileDropper bind:file previewUrl={undefined} />
+        <FileDropper bind:file previewUrl={undefined} />
 
-      <button type="submit">Save</button>
-    </form>
+        <button type="submit">Save</button>
+      </form>
+    {/if}
   </div>
 </div>
 
-<form bind:this={createForm} method="POST" enctype="multipart/form-data" action="?/createProject" use:enhance>
+<form bind:this={createForm} method="POST" enctype="multipart/form-data" action="?/createProject" use:enhance={enhancement}>
   <input type="text" name="title" value={title} />
   <input type="text" name="description" value={description} />
   <input type="file" name="file" bind:this={hiddenFileInput} style="display: none;" />

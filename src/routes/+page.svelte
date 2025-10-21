@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Lander from "$lib/components/Lander.svelte";
-  import image from '$lib/assets/turntable.png';
+  import image from '$lib/assets/turntable.webp';
 	import CTAGrid from "$lib/components/CTAGrid.svelte";
   import ContactGrid from "$lib/components/ContactGrid.svelte";
 	import Separator from "$lib/components/Separator.svelte";

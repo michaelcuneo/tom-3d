@@ -13,7 +13,7 @@
 		updated?: Date;
 	} = $props();
 
-	import Stacco from '$lib/assets/stacco.jpeg';
+	import Stacco from '$lib/assets/stacco.webp';
 
 	if (!image) {
 		image = Stacco;

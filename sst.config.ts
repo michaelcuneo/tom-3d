@@ -6,7 +6,7 @@ export default $config({
 		return {
 			name: 'tom-3d',
 			removal: input?.stage === 'production' ? 'retain' : 'remove',
-			protect: ['production'].includes(input?.stage),
+			// protect: ['production'].includes(input?.stage),
 			home: 'aws',
 			providers: {
 				aws: {
@@ -36,10 +36,9 @@ export default $config({
 
 		const ThomasProject = new sst.aws.Dynamo('ThomasProject', {
 			fields: {
-				projectId: 'string',
-				createdAt: 'number'
+				projectId: 'string'
 			},
-			primaryIndex: { hashKey: 'projectId', rangeKey: 'createdAt' }
+			primaryIndex: { hashKey: 'projectId' }
 		});
 
 		const ThomasProjectApi = new sst.aws.ApiGatewayV2('ThomasProjectApi', {
@@ -54,7 +53,7 @@ export default $config({
 		ThomasProjectApi.route('GET /', './api/api.handler');
 		ThomasProjectApi.route('GET /projects/list', './api/projects.listProjects');
 		ThomasProjectApi.route('POST /project/create', './api/projects.createProject');
-		ThomasProjectApi.route('PUT /project/update/{projectId}', './api/projects.updateProject');
+		ThomasProjectApi.route('PUT /project/update', './api/projects.updateProject');
 		ThomasProjectApi.route('DELETE /project/delete', './api/projects.deleteProject');
 
 		ThomasProjectApi.route('GET /user/get/{email}', './api/users.getUser');

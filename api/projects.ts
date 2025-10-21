@@ -75,7 +75,7 @@ export const getProject: APIGatewayProxyHandlerV2 = async (event: APIGatewayProx
 	try {
 		const command = new GetCommand({
 			TableName: Resource.ThomasProject.name,
-			Key: { id }
+			Key: { projectId: id }
 		});
 
 		const data = await documentClient.send(command);
@@ -95,16 +95,26 @@ export const getProject: APIGatewayProxyHandlerV2 = async (event: APIGatewayProx
 	}
 };
 
-export const updateProject: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEventV2) => {
+export const updateProject: APIGatewayProxyHandlerV2 = async (event) => {
 	const body = JSON.parse(event?.body || '');
+
+	console.log('updateProject body:', body);
 
 	const params = {
 		TableName: Resource.ThomasProject.name,
-		Key: { id: body.id },
-		UpdateExpression: 'SET onboard = :onboard, groups = :groups, updatedAt = :updatedAt',
+		Key: {
+			projectId: body.id
+		},
+		UpdateExpression: `
+			SET title = :title,
+				description = :description,
+			  imageKey = :imageKey,
+			  updatedAt = :updatedAt
+		`,
 		ExpressionAttributeValues: {
-			':onboard': body.onboard,
-			':groups': body.groups,
+			':title': body.title,
+			':description': body.description,
+			':imageKey': body.imageKey,
 			':updatedAt': new Date().toISOString()
 		}
 	};
@@ -114,14 +124,13 @@ export const updateProject: APIGatewayProxyHandlerV2 = async (event: APIGatewayP
 
 		return {
 			statusCode: 200,
-			body: updateResult
-				? JSON.stringify(updateResult)
-				: JSON.stringify('Error: Project not updated')
+			body: JSON.stringify(updateResult ?? 'No result from update')
 		};
 	} catch (err) {
+		console.error('Update failed:', err);
 		return {
 			statusCode: 500,
-			body: JSON.stringify(err)
+			body: JSON.stringify({ message: 'Update error', details: err })
 		};
 	}
 };
@@ -133,7 +142,7 @@ export const deleteProject: APIGatewayProxyHandlerV2 = async (event: APIGatewayP
 		const params = {
 			TableName: Resource.ThomasProject.name,
 			Key: {
-				id: id
+				projectId: id
 			}
 		};
 

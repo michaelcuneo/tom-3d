@@ -1,8 +1,10 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
+	import Loader from '$lib/components/Loader.svelte';
   import { selectedProject } from '$lib/utils/state';
 
   let deleteForm: HTMLFormElement | null = $state(null);
+  let submitting = $state(false);
   
   let { onclickClose = () => {} }: { onclickClose?(): void } = $props();
 
@@ -13,6 +15,16 @@
     event.preventDefault();
     deleteForm?.requestSubmit();
   }
+
+  const enhancement = async () => {
+    submitting = true;
+    return async ({ update }: { update: () => Promise<void> }) => {
+      await update().then(() => {
+        submitting = false;
+        close();
+      });
+    };
+  };
 
   function close() {
     onclickClose();
@@ -26,17 +38,21 @@
       <button class="close-btn" onclick={close}>×</button>
     </header>
 
-    <form onsubmit={submit}>
-      <p>Are you sure you want to delete <strong>{$selectedProject?.title}</strong>?</p>
-      <div class="actions">
-        <button type="button" onclick={close}>Cancel</button>
-        <button type="submit" class="danger">Delete</button>
-      </div>
-    </form>
+    {#if submitting}
+      <Loader label="Deleting Project..." />
+    {:else}
+      <form onsubmit={submit}>
+        <p>Are you sure you want to delete <strong>{$selectedProject?.title}</strong>?</p>
+        <div class="actions">
+          <button type="button" onclick={close}>Cancel</button>
+          <button type="submit" class="danger">Delete</button>
+        </div>
+      </form>
+    {/if}
   </div>
 </div>
 
-<form bind:this={deleteForm} method="POST" action="?/deleteProject" use:enhance style="display: none;">
+<form bind:this={deleteForm} method="POST" action="?/deleteProject" use:enhance={enhancement} style="display: none;">
   <input type="hidden" name="id" value={projectId} />
   <input type="hidden" name="key" value={imageKey} />
 </form>

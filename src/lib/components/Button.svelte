@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   let {
     onclick = () => {},
-    label = 'Download 3D Sound FX',
+    label = 'Download 3D Sound FX',
     icon = '⬇️',
     variant = 'primary'  // you can add more variants if you like
   }: {
@@ -13,7 +11,7 @@
     variant?: 'primary' | 'alt';
   } = $props();
 
-  let isPressed = false;
+  let isPressed = $state(false);
 
   function handleMouseDown() {
     isPressed = true;

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import imageUrl from '$lib/assets/captain.webp';
   let {
     onclick = () => {},
   }: {
@@ -7,7 +8,7 @@
 </script>
 
 <div class="project-card-wrapper">
-  <button class="project-card add-card" onclick={onclick}>
+  <button class="project-card add-card" onclick={onclick} style={`background-image: url("${imageUrl}");`}>
     <div class="overlay">
       <h3>+ Add Project</h3>
       <p>Create a new project entry</p>
@@ -21,11 +22,12 @@
   }
 
   .project-card {
-    background: linear-gradient(to bottom, oklch(0.95 0.01 260), oklch(0.1 0 0));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     border-radius: 1rem;
     box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
-    font-family: 'Inter', sans-serif;
-    max-width: 600px;
+    max-width: 320px;
     margin: 2rem auto;
     overflow: hidden;
     position: relative;
@@ -45,7 +47,6 @@
   }
 
   .add-card {
-    background: none;
     justify-content: center;
     padding: 0;
     border: none;
