@@ -1,14 +1,10 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { randomUUID } from 'crypto';
-import { Resource } from 'sst';
+import { v4 as uuidv4 } from 'uuid';
 
-const s3 = new S3Client();
-
-export async function uploadImageWithThumb(
+export async function generateImageWithThumb(
 	original: File,
 	format: 'image/webp' | 'image/jpeg' = 'image/webp',
 	quality = 0.8
-): Promise<string> {
+): Promise<{ fullKey: string; fullBlob: Blob; thumbKey: string; thumbBlob: Blob }> {
 	const readImage = (file: File): Promise<HTMLImageElement> =>
 		new Promise((resolve, reject) => {
 			const img = new Image();
@@ -53,28 +49,10 @@ export async function uploadImageWithThumb(
 	const fullBlob = await resize(img, 1200, 800);
 	const thumbBlob = await resize(img, 600, 400);
 
-	const baseKey = randomUUID();
+	const baseKey = uuidv4();
 	const ext = format === 'image/webp' ? 'webp' : 'jpg';
 	const fullKey = `${baseKey}.${ext}`;
 	const thumbKey = `${baseKey}_thumb.${ext}`;
 
-	await s3.send(
-		new PutObjectCommand({
-			Bucket: Resource.ThomasBucket.name,
-			Key: fullKey,
-			Body: new Uint8Array(await fullBlob.arrayBuffer()),
-			ContentType: format
-		})
-	);
-
-	await s3.send(
-		new PutObjectCommand({
-			Bucket: Resource.ThomasBucket.name,
-			Key: thumbKey,
-			Body: new Uint8Array(await thumbBlob.arrayBuffer()),
-			ContentType: format
-		})
-	);
-
-	return fullKey;
+	return { fullKey, fullBlob, thumbKey, thumbBlob };
 }

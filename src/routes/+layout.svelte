@@ -25,8 +25,6 @@
 			isLoggedIn: boolean;
 		};
 	} = $props();
-
-	$inspect(data);
 </script>
 
 <svelte:head>

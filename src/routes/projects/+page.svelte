@@ -14,6 +14,13 @@
 
   let { data }: { data: { projects: any[]; isLoggedIn: boolean } } = $props();
 
+  let projects = $state(data.projects || []);
+
+  // When data.projects updates (after invalidation), sync it
+  $effect(() => {
+    projects = data.projects;
+  });
+
   function openAddModal() {
     selectedProject.set(null);
     showAddModal = true;
@@ -37,7 +44,7 @@
     {#if data.isLoggedIn}
       <AddProjectCard onclick={openAddModal} />
     {/if}
-    {#each data.projects as project (project.projectId)}
+    {#each projects as project (project.projectId)}
       <ProjectCard
         title={project.title}
         description={project.description}

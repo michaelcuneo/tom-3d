@@ -1,7 +1,8 @@
 import type { PageServerLoad, Actions } from './$types';
-import { uploadImageWithThumb } from '$lib/utils/uploadImageWithThumb';
 import { Resource } from 'sst';
-import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+
+const s3 = new S3Client({});
 
 export const load: PageServerLoad = async ({ fetch, locals }) => {
 	const apiUrl = `${Resource.ThomasProjectApi.url}/projects/list?t=${Date.now()}`;
@@ -16,7 +17,7 @@ export const load: PageServerLoad = async ({ fetch, locals }) => {
 		rawProjects.map(async (proj) => {
 			if (proj.featuredImage) {
 				const region = process.env.AWS_REGION ?? 'us-east-1'; // fallback if not set
-				const url = `https://${Resource.ThomasBucket.name}.s3.${region}.amazonaws.com/${proj.featuredImage}`;
+				const url = `https://${Resource.ThomasBucket.name}.s3.${region}.amazonaws.com/${proj.featuredImage}?t=${Date.now()}`;
 				return { ...proj, featuredImageUrl: url };
 			}
 			return { ...proj, featuredImageUrl: undefined };
@@ -36,18 +37,41 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const title = data.get('title')?.toString();
 		const description = data.get('description')?.toString();
-		const file = data.get('file') as File;
+		const featured = data.get('featured') === 'true';
+		const imageKey = data.get('imageKey')?.toString();
+		const full = data.get('file_full') as File;
+		const thumb = data.get('file_thumb') as File;
+		const sort = featured ? Date.now() + 1_000_000_000_000 : Date.now();
 
-		if (!title || !description || !file || typeof file === 'string') {
-			return { error: 'Missing required fields or file' };
+		if (!title || !description || !imageKey || !full || !thumb) {
+			return { error: 'Missing required fields or files' };
 		}
 
-		const key = await uploadImageWithThumb(file);
+		// Upload to S3
+		await Promise.all([
+			s3.send(
+				new PutObjectCommand({
+					Bucket: Resource.ThomasBucket.name,
+					Key: imageKey,
+					Body: new Uint8Array(await full.arrayBuffer()),
+					ContentType: full.type
+				})
+			),
+			s3.send(
+				new PutObjectCommand({
+					Bucket: Resource.ThomasBucket.name,
+					Key: imageKey.replace(/\.\w+$/, '_thumb.webp'),
+					Body: new Uint8Array(await thumb.arrayBuffer()),
+					ContentType: thumb.type
+				})
+			)
+		]);
 
+		// Continue to API creation
 		const res = await fetch(Resource.ThomasProjectApi.url + '/project/create', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ title, description, imageKey: key })
+			body: JSON.stringify({ title, description, imageKey, sort })
 		});
 
 		if (!res.ok) return { error: 'Failed to create project' };
@@ -56,24 +80,48 @@ export const actions: Actions = {
 
 	updateProject: async ({ request }) => {
 		const data = await request.formData();
+
 		const id = data.get('id')?.toString();
+		const sort = Number(data.get('sort'));
 		const title = data.get('title')?.toString();
 		const description = data.get('description')?.toString();
+		const createdAt = data.get('createdAt')?.toString();
 		const oldKey = data.get('existingKey')?.toString();
-		const file = data.get('file') as File; // this matches your form name
+		const newKey = data.get('imageKey')?.toString();
+		const fileFull = data.get('file_full') as File;
+		const fileThumb = data.get('file_thumb') as File;
 
-		if (!id || !title || !description) return { error: 'Missing required fields' };
+		if (!id || !title || !description || !sort) {
+			return { error: 'Missing required fields' };
+		}
 
-		const s3 = new S3Client({});
-		const bucket = Resource.ThomasBucket.name;
-		let key = oldKey; // default to existing image
+		let finalKey = oldKey;
 
-		// if a new file was uploaded, process and upload it
-		if (file && typeof file !== 'string' && file.size > 0) {
-			const newKey = await uploadImageWithThumb(file);
+		// If a new image has been uploaded, process it
+		if (newKey && newKey !== oldKey && fileFull && fileThumb) {
+			const s3 = new S3Client({});
+			const bucket = Resource.ThomasBucket.name;
 
-			// delete the old full + thumb if a previous image existed
-			if (oldKey && oldKey !== newKey) {
+			await Promise.all([
+				s3.send(
+					new PutObjectCommand({
+						Bucket: bucket,
+						Key: newKey,
+						Body: new Uint8Array(await fileFull.arrayBuffer()),
+						ContentType: fileFull.type
+					})
+				),
+				s3.send(
+					new PutObjectCommand({
+						Bucket: bucket,
+						Key: newKey.replace(/\.\w+$/, '_thumb.webp'),
+						Body: new Uint8Array(await fileThumb.arrayBuffer()),
+						ContentType: fileThumb.type
+					})
+				)
+			]);
+
+			if (oldKey) {
 				try {
 					await Promise.all([
 						s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: oldKey })),
@@ -85,34 +133,40 @@ export const actions: Actions = {
 						)
 					]);
 				} catch (err) {
-					console.warn('Warning: failed to delete old image(s):', err);
+					console.warn('Failed to delete old images:', err);
 				}
 			}
 
-			key = newKey; // replace with the new uploaded image key
+			finalKey = newKey;
 		}
 
-		// update project record through your API
+		// Now send the update request to the API
 		const res = await fetch(`${Resource.ThomasProjectApi.url}/project/update`, {
 			method: 'PUT',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ id, title, description, imageKey: key })
+			body: JSON.stringify({
+				id,
+				sort,
+				title,
+				description,
+				createdAt,
+				imageKey: finalKey
+			})
 		});
 
-		const resText = await res.text();
-		console.log('Update API response:', res.status, resText);
-
 		if (!res.ok) return { error: 'Failed to update project' };
-
 		return { success: true };
 	},
 
 	deleteProject: async ({ request }) => {
 		const data = await request.formData();
 		const id = data.get('id')?.toString();
+		const sort = data.get('sort')?.toString();
 		const key = data.get('key')?.toString();
 
-		if (!id || !key) return { error: 'Missing project ID or key' };
+		if (!id || !sort || !key) {
+			return { error: 'Missing required fields' };
+		}
 
 		const s3 = new S3Client();
 		const bucket = Resource.ThomasBucket.name;
@@ -130,7 +184,7 @@ export const actions: Actions = {
 		const res = await fetch(Resource.ThomasProjectApi.url + '/project/delete', {
 			method: 'DELETE',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(id)
+			body: JSON.stringify({ id, sort })
 		});
 
 		if (!res.ok) return { error: 'Failed to delete project' };

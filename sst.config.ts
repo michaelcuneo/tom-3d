@@ -36,9 +36,10 @@ export default $config({
 
 		const ThomasProject = new sst.aws.Dynamo('ThomasProject', {
 			fields: {
-				projectId: 'string'
+				projectId: 'string',
+				sort: 'number'
 			},
-			primaryIndex: { hashKey: 'projectId' }
+			primaryIndex: { hashKey: 'projectId', rangeKey: 'sort' }
 		});
 
 		const ThomasProjectApi = new sst.aws.ApiGatewayV2('ThomasProjectApi', {

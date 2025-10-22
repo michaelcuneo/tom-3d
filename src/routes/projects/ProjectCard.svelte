@@ -89,7 +89,7 @@
     border-radius: 1rem;
     box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
     font-family: 'Inter', sans-serif;
-    max-width: 600px;
+    max-width: 320px;
     margin: 2rem auto;
     overflow: hidden;
     position: relative;

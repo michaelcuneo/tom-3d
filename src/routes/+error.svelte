@@ -1,8 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
-  
-  $: console.log(page);
-</script>
+  </script>
 
 <section class="error-wrapper">
   <div class="error-panel">

@@ -37,14 +37,13 @@ export const listProjects: APIGatewayProxyHandlerV2 = async () => {
 export const createProject: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEventV2) => {
 	const body = JSON.parse(event?.body || '');
 
-	console.log('createProject body:', body);
-
 	const params = {
 		TableName: Resource.ThomasProject.name,
 		Item: {
 			projectId: uuidv4(), // Generate a unique ID
 			title: body.title,
 			description: body.description,
+			sort: body.sort,
 			featuredImage: body.imageKey || null,
 			createdAt: Date.now(),
 			updatedAt: Date.now()
@@ -98,24 +97,25 @@ export const getProject: APIGatewayProxyHandlerV2 = async (event: APIGatewayProx
 export const updateProject: APIGatewayProxyHandlerV2 = async (event) => {
 	const body = JSON.parse(event?.body || '');
 
-	console.log('updateProject body:', body);
-
 	const params = {
 		TableName: Resource.ThomasProject.name,
 		Key: {
-			projectId: body.id
+			projectId: body.id,
+			sort: Number(body.sort)
 		},
 		UpdateExpression: `
 			SET title = :title,
 				description = :description,
-			  imageKey = :imageKey,
+			  featuredImage = :featuredImage,
+				createdAt = :createdAt,
 			  updatedAt = :updatedAt
 		`,
 		ExpressionAttributeValues: {
 			':title': body.title,
 			':description': body.description,
-			':imageKey': body.imageKey,
-			':updatedAt': new Date().toISOString()
+			':featuredImage': body.imageKey,
+			':createdAt': body.createdAt,
+			':updatedAt': Date.now()
 		}
 	};
 
@@ -136,13 +136,14 @@ export const updateProject: APIGatewayProxyHandlerV2 = async (event) => {
 };
 
 export const deleteProject: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEventV2) => {
-	const id = JSON.parse(event?.body || '');
+	const { id, sort } = JSON.parse(event?.body || '');
 
 	try {
 		const params = {
 			TableName: Resource.ThomasProject.name,
 			Key: {
-				projectId: id
+				projectId: id,
+				sort: Number(sort)
 			}
 		};
 

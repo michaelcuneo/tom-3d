@@ -1,70 +1,92 @@
 <script lang="ts">
-  import { enhance, applyAction } from '$app/forms';
+  import { applyAction, enhance } from '$app/forms';
+  import { invalidateAll } from '$app/navigation';
   import FileDropper from '$lib/components/FileDropper.svelte';
-	import Loader from '$lib/components/Loader.svelte';
+  import Loader from '$lib/components/Loader.svelte';
+  import { generateImageWithThumb } from '$lib/utils/generateImageWithThumb';
+  import { Cross } from '@lucide/svelte';
+	import type { SubmitFunction } from '@sveltejs/kit';
 
   let createForm: HTMLFormElement | null = $state(null);
-  let hiddenFileInput: HTMLInputElement | null = $state(null);
 
-  let title = $state();
-  let description = $state();
-  let submitting = $state(false);
+  let title: string = $state('');
+  let description: string = $state('');
+  let submitting: boolean = $state(false);
   let file: File | null = $state(null);
+  let featured: boolean = $state(false);
 
-  let {
-    onclickClose = () => {}
-  }: {
-    onclickClose?(): void;
-  } = $props();
-
-  function submit(event: Event) {
-    event.preventDefault();
-    createForm?.requestSubmit();
-  }
+  let { onclickClose = () => {} } = $props();
 
   function close() {
     onclickClose();
   }
 
-  const enhancement = async () => {
-    submitting = true;
-    return async ({ update }: { update: () => Promise<void> }) => {
-      await update().then(() => {
+  const enhancement: SubmitFunction = async ({ cancel, formData }) => {
+    if (file && typeof file !== 'string') {
+      try {
+        const { fullBlob, thumbBlob, fullKey, thumbKey } = await generateImageWithThumb(file);
+
+        const fullFile = new File([fullBlob], fullKey, { type: fullBlob.type });
+        const thumbFile = new File([thumbBlob], thumbKey, { type: thumbBlob.type });
+
+        formData.set('imageKey', fullKey);
+        formData.set('file_full', fullFile);
+        formData.set('file_thumb', thumbFile);
+      } catch (err) {
         submitting = false;
+        cancel();
+        return async () => {}; // prevent submit
+      }
+    }
+
+    // 🔁 This runs *after* the form submission
+    return async ({ result }) => {
+      submitting = true;
+      await applyAction(result);
+
+      if (result.type === 'success') {
+        await invalidateAll();
         close();
-      });
+      } else {
+        console.error('Failed to create project');
+      }
+
+      cancel();
+      submitting = false;
     };
   };
-
-  $effect(() => {
-    if (file && hiddenFileInput) {
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      hiddenFileInput.files = dataTransfer.files;
-    } else if (hiddenFileInput) {
-      hiddenFileInput.value = ''; // clear it
-    }
-  });
 </script>
 
 <div class="modal-backdrop">
   <div class="modal-content">
     <header>
       <h2>Add Project</h2>
-      <button class="close-btn" onclick={close}>×</button>
+      <button class="close-btn" onclick={close}><Cross /></button>
     </header>
 
     {#if submitting}
       <Loader label="Creating Project..." />
     {:else}
-      <form onsubmit={submit}>
+      <form
+        bind:this={createForm}
+        method="POST"
+        enctype="multipart/form-data"
+        action="?/createProject"
+        use:enhance={enhancement}
+      >
         <label>
           Title
-          <input type="text" bind:value={title} required />
+          <input type="text" name="title" bind:value={title} required />
         </label>
+
         <label>
           Description
-          <textarea bind:value={description} required></textarea>
+          <textarea name="description" bind:value={description} required></textarea>
+        </label>
+
+        <label class="checkbox-row">
+          <input type="checkbox" name="featured" bind:checked={featured} />
+          <span class="checkbox-label">Feature this project</span>
         </label>
 
         <FileDropper bind:file previewUrl={undefined} />
@@ -74,12 +96,6 @@
     {/if}
   </div>
 </div>
-
-<form bind:this={createForm} method="POST" enctype="multipart/form-data" action="?/createProject" use:enhance={enhancement}>
-  <input type="text" name="title" value={title} />
-  <input type="text" name="description" value={description} />
-  <input type="file" name="file" bind:this={hiddenFileInput} style="display: none;" />
-</form>
 
 <style>
   .modal-backdrop {
@@ -140,6 +156,7 @@
     background: oklch(0.7 0.2 260);
     color: white;
     padding: 0.75rem 1.5rem;
+    margin-top: 1rem;
     font-weight: 600;
     border: none;
     border-radius: 0.5rem;
@@ -148,5 +165,25 @@
 
   button[type="submit"]:hover {
     background: oklch(0.6 0.2 260);
+  }
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    color: oklch(0.25 0.02 260);
+    font-family: inherit;
+  }
+
+  .checkbox-row input[type='checkbox'] {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: oklch(0.7 0.2 260); /* matches your button color */
+    cursor: pointer;
+  }
+
+  .checkbox-label {
+    user-select: none;
   }
 </style>

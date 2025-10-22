@@ -263,3 +263,9 @@ ul {
 .ham4.active .bottom {
 	stroke-dashoffset: -68px;
 }
+input[type='checkbox'] {
+	width: 1.2rem;
+	height: 1.2rem;
+	appearance: checkbox;
+	accent-color: oklch(0.7 0.2 260);
+}

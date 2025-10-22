@@ -13,8 +13,6 @@
     previewUrl?: string;
   } = $props();
 
-  $inspect(file, variant, label, previewUrl, 'props');
-
   let dropArea: HTMLElement | undefined = $state();
   let progressBar: HTMLElement | undefined = $state();
   let gallery: HTMLElement | undefined = $state();
@@ -145,7 +143,7 @@
 	.drop-area {
 		display: flex;
 		flex-direction: column;
-		border: 2px dashed var(--color-border);
+		border: 2px dashed #ccc;
 		border-radius: 20px;
 		width: 100%;
 		min-width: 300px;
@@ -154,19 +152,19 @@
 		justify-content: center;
 		align-items: center;
 		font-family: system-ui, sans-serif;
-		color: var(--color-text);
-		background: var(--color-background);
+		color: #333;
+		background: #fff;
 		outline: none;
 		transition: all 0.3s ease-in-out;
 	}
 
 	.drop-area:focus {
-		box-shadow: 0 0 0 3px var(--color-focus);
+		box-shadow: 0 0 0 3px #007BFF;
 	}
 
 	.highlight {
-		background-color: var(--color-surface);
-		border-color: var(--color-accent);
+		background-color: #f8f9fa;
+		border-color: #007BFF;
 	}
 
 	.gallery {
@@ -181,7 +179,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		background: var(--color-surface);
+		background: #f8f9fa;
 		border-radius: 12px;
 		padding: 0.5rem 1rem;
 		width: 100%;
@@ -194,8 +192,8 @@
 	}
 
 	.icon-button {
-		background: var(--color-danger);
-		color: var(--color-background);
+		background: #d32f2f;
+		color: #fff;
 		border-radius: 50%;
 		border: none;
 		padding: 6px;
@@ -203,7 +201,7 @@
 	}
 
 	.icon-button:hover {
-		background: var(--color-danger-hover);
+		background: #b71c1c;
 	}
 
 	.files {
@@ -213,7 +211,7 @@
 	.button {
 		text-decoration: underline;
 		cursor: pointer;
-		color: var(--color-accent);
+		color: #007BFF;
 	}
 
 	img {
@@ -229,33 +227,33 @@
 		text-overflow: ellipsis;
 	}
 
-	/* Neumorphic variant using your vars */
+	/* Neumorphic variant */
 	.drop-area.neumorphic {
 		border: none;
-		background: var(--background-color);
+		background: #e0e0e0;
 		box-shadow:
-			8px 8px 16px var(--neumorphism-shadow),
-			-8px -8px 16px var(--neumorphism-highlight);
+			8px 8px 16px #bebebe,
+			-8px -8px 16px #ffffff;
 	}
 
 	.drop-area.neumorphic.highlight {
 		box-shadow:
-			inset 8px 8px 16px var(--neumorphism-shadow-active),
-			inset -8px -8px 16px var(--neumorphism-highlight-active);
+			inset 8px 8px 16px #bebebe,
+			inset -8px -8px 16px #ffffff;
 	}
 
 	.drop-area.neumorphic .image-container {
-		background: var(--background-color);
+		background: #e0e0e0;
 		box-shadow:
-			4px 4px 10px var(--neumorphism-shadow),
-			-4px -4px 10px var(--neumorphism-highlight);
+			4px 4px 10px #bebebe,
+			-4px -4px 10px #ffffff;
 	}
 
 	.drop-area.neumorphic .progress {
-		background: var(--background-color);
+		background: #e0e0e0;
 		box-shadow:
-			inset 4px 4px 8px var(--neumorphism-shadow),
-			inset -4px -4px 8px var(--neumorphism-highlight);
+			inset 4px 4px 8px #bebebe,
+			inset -4px -4px 8px #ffffff;
 		border-radius: 999px;
 		overflow: hidden;
 	}

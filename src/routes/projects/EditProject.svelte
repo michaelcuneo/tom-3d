@@ -1,53 +1,68 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
+  import type { SubmitFunction } from '@sveltejs/kit';
+  import { enhance, applyAction } from '$app/forms';
+  import { invalidateAll } from '$app/navigation';
+  import { generateImageWithThumb } from '$lib/utils/generateImageWithThumb';
   import Loader from '$lib/components/Loader.svelte';
   import FileDropper from '$lib/components/FileDropper.svelte';
   import { selectedProject } from '$lib/utils/state';
 
-  let updateForm: HTMLFormElement | null = $state(null);
-  let hiddenFileInput: HTMLInputElement | null = $state(null);
-  let id = $state($selectedProject?.projectId || '');
-  let title = $state($selectedProject?.title || '');
-  let description = $state($selectedProject?.description || '');
-  let file: File | null = $state(null);
-  let existingImageUrl: string = $state($selectedProject?.featuredImageUrl || '');
   let submitting = $state(false);
 
-  let {
-    onclickClose = () => {}
-  }: {
-    onclickClose?(): void;
-  } = $props();
+  let { onclickClose = () => {} } = $props();
 
-  function submit(event: Event) {
-    event.preventDefault();
-    updateForm?.requestSubmit();
-  }
+  let projectId = $state($selectedProject?.projectId || '');
+  let title = $state($selectedProject?.title || '');
+  let sort = $state($selectedProject?.sort);
+  let description = $state($selectedProject?.description || '');
+  let createdAt = $state($selectedProject?.createdAt || '');
+  let file: File | null = $state(null);
+  let imageKey: string = $state(
+    $selectedProject?.featuredImageUrl?.split('/').pop()?.split('?')[0] || ''
+  );
+  let existingImageUrl: string = $state($selectedProject?.featuredImageUrl || '');
+  let featured: boolean | null | undefined = $state($selectedProject?.sort && $selectedProject.sort > Date.now());
 
   function close() {
     onclickClose();
   }
 
-  const enhancement = async () => {
-    submitting = true;
-    return async ({ update }: { update: () => Promise<void> }) => {
-      await update().then(() => {
-        submitting = false;
+  const enhancement: SubmitFunction = async ({ formData, cancel }) => {
+    if (file && typeof file !== 'string') {
+      try {
+        const { fullBlob, thumbBlob, fullKey, thumbKey } = await generateImageWithThumb(file);
+
+        const fullFile = new File([fullBlob], fullKey, { type: fullBlob.type });
+        const thumbFile = new File([thumbBlob], thumbKey, { type: thumbBlob.type });
+
+        imageKey = fullKey;
+
+        formData.set('imageKey', fullKey);
+        formData.set('file_full', fullFile);
+        formData.set('file_thumb', thumbFile);
+      } catch (err) {
+        console.error('Image generation failed:', err);
+        cancel();
+        return;
+      }
+    }
+
+    return async ({ result }) => {
+      submitting = true;
+
+      await applyAction(result);
+
+      if (result.type === 'success') {
+        await invalidateAll();
         close();
-      });
+      } else {
+        console.error('Failed to update project:', result);
+      }
+
+      cancel();
+      submitting = false;
     };
   };
-
-
-  $effect(() => {
-    if (file && hiddenFileInput) {
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      hiddenFileInput.files = dataTransfer.files;
-    } else if (hiddenFileInput) {
-      hiddenFileInput.value = ''; // clear it
-    }
-  });
 </script>
 
 <div class="modal-backdrop">
@@ -60,15 +75,25 @@
     {#if submitting}
       <Loader label="Updating Project..." />
     {:else}
-
-      <form onsubmit={submit}>
+      <form
+        method="POST"
+        enctype="multipart/form-data"
+        action="?/updateProject"
+        use:enhance={enhancement}
+      >
         <label>
           Title
-          <input type="text" bind:value={title} required />
+          <input type="text" name="title" bind:value={title} required />
         </label>
+
         <label>
           Description
-          <textarea bind:value={description} required></textarea>
+          <textarea name="description" bind:value={description} required></textarea>
+        </label>
+
+        <label class="checkbox-row">
+          <input type="checkbox" name="featured" bind:checked={featured} />
+          <span class="checkbox-label">Feature this project</span>
         </label>
 
         <FileDropper
@@ -77,22 +102,23 @@
           onremove={() => {
             file = null;
             existingImageUrl = '';
-           }}
+          }}
         />
+
+        <!-- Hidden Inputs -->
+        <input type="hidden" name="id" value={projectId} />
+        <input type="hidden" name="sort" value={sort} />
+        <input type="hidden" name="createdAt" value={createdAt} />
+        {#if imageKey}
+          <input type="hidden" name="imageKey" value={imageKey} />
+        {/if}
+        <input type="hidden" name="existingKey" value={imageKey} />
 
         <button type="submit">Save</button>
       </form>
     {/if}
   </div>
 </div>
-
-<form bind:this={updateForm} method="POST" enctype="multipart/form-data" action="?/updateProject" use:enhance={enhancement}>
-  <input type="text" name="id" value={id} />
-  <input type="text" name="title" value={title} />
-  <input type="text" name="description" value={description} />
-  <input type="text" name="existingKey" value={$selectedProject?.featuredImage || ''} />
-  <input type="file" name="file" bind:this={hiddenFileInput} style="display: none;" />
-</form>
 
 <style>
   .modal-backdrop {
@@ -153,6 +179,7 @@
     background: oklch(0.7 0.2 260);
     color: white;
     padding: 0.75rem 1.5rem;
+    margin-top: 1rem;
     font-weight: 600;
     border: none;
     border-radius: 0.5rem;
@@ -161,5 +188,26 @@
 
   button[type="submit"]:hover {
     background: oklch(0.6 0.2 260);
+  }
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    color: oklch(0.25 0.02 260);
+    font-family: inherit;
+  }
+
+  .checkbox-row input[type='checkbox'] {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: oklch(0.7 0.2 260);
+    cursor: pointer;
+  }
+
+  .checkbox-label {
+    user-select: none;
   }
 </style>

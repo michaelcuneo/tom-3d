@@ -2,6 +2,7 @@ type Project = {
 	projectId: string;
 	title: string;
 	description: string;
+	sort: number;
 	featuredImage?: string | null;
 	featuredImageUrl?: string | null;
 	updatedAt: AWSDateTime;

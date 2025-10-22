@@ -1,34 +1,44 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
-	import Loader from '$lib/components/Loader.svelte';
+  import { enhance, applyAction } from '$app/forms';
+  import { invalidateAll } from '$app/navigation';
+  import Loader from '$lib/components/Loader.svelte';
   import { selectedProject } from '$lib/utils/state';
+	import type { SubmitFunction } from '@sveltejs/kit';
 
-  let deleteForm: HTMLFormElement | null = $state(null);
   let submitting = $state(false);
-  
-  let { onclickClose = () => {} }: { onclickClose?(): void } = $props();
 
-  let projectId: string | null = $state($selectedProject?.projectId || null);
-  let imageKey: string | null = $state($selectedProject?.featuredImage || null);
+  let { onclickClose = () => {} } = $props();
 
-  function submit(event: Event) {
-    event.preventDefault();
-    deleteForm?.requestSubmit();
-  }
-
-  const enhancement = async () => {
-    submitting = true;
-    return async ({ update }: { update: () => Promise<void> }) => {
-      await update().then(() => {
-        submitting = false;
-        close();
-      });
-    };
-  };
+  let projectId: string = $state($selectedProject?.projectId || '');
+  let imageKey: string = $state($selectedProject?.featuredImage || '');
+  let sort: number = $state($selectedProject?.sort || 0);
 
   function close() {
     onclickClose();
   }
+
+  const enhancement: SubmitFunction = ({ cancel }) => {
+    return async ({ result }) => {
+      submitting = true;
+
+      await applyAction(result);
+
+      if (result.type === 'success') {
+        submitting = false;
+        await invalidateAll();
+        close();
+        cancel();
+        return;
+      } else {
+        submitting = false;
+        close();
+        cancel();
+        console.error('Failed to delete project');
+      }
+
+      return;
+    };
+  };
 </script>
 
 <div class="modal-backdrop">
@@ -41,8 +51,11 @@
     {#if submitting}
       <Loader label="Deleting Project..." />
     {:else}
-      <form onsubmit={submit}>
+      <form method="POST" action="?/deleteProject" use:enhance={enhancement}>
         <p>Are you sure you want to delete <strong>{$selectedProject?.title}</strong>?</p>
+        <input type="hidden" name="id" value={projectId} />
+        <input type="hidden" name="key" value={imageKey} />
+        <input type="hidden" name="sort" value={sort} />
         <div class="actions">
           <button type="button" onclick={close}>Cancel</button>
           <button type="submit" class="danger">Delete</button>
@@ -51,11 +64,6 @@
     {/if}
   </div>
 </div>
-
-<form bind:this={deleteForm} method="POST" action="?/deleteProject" use:enhance={enhancement} style="display: none;">
-  <input type="hidden" name="id" value={projectId} />
-  <input type="hidden" name="key" value={imageKey} />
-</form>
 
 <style>
   .modal-backdrop {

@@ -1,6 +1,5 @@
 <script lang="ts">
 	let { isLoggedIn }: { isLoggedIn?: boolean } = $props();
-	$inspect(isLoggedIn, 'props');
 </script>
 
 <div>
