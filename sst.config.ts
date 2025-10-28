@@ -6,7 +6,7 @@ export default $config({
 		return {
 			name: 'tom-3d',
 			removal: input?.stage === 'production' ? 'retain' : 'remove',
-			// protect: ['production'].includes(input?.stage),
+			protect: ['production'].includes(input?.stage),
 			home: 'aws',
 			providers: {
 				aws: {
@@ -71,7 +71,15 @@ export default $config({
 		});
 
 		new sst.aws.SvelteKit('ThomasWeb', {
-			link: [ThomasAuth, ThomasProjectApi, ThomasBucket, emailer]
+			link: [ThomasAuth, ThomasProjectApi, ThomasBucket, emailer],
+			domain: {
+				name: '3dsoundfx.com',
+				redirects: ['www.3dsoundfx.com']
+			}
 		});
+
+		return {
+			ThomasBucket
+		};
 	}
 });

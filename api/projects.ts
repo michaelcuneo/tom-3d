@@ -44,7 +44,7 @@ export const createProject: APIGatewayProxyHandlerV2 = async (event: APIGatewayP
 			title: body.title,
 			description: body.description,
 			sort: body.sort,
-			featuredImage: body.imageKey || null,
+			mediaUrl: body.mediaUrl || null,
 			createdAt: Date.now(),
 			updatedAt: Date.now()
 		}
@@ -106,14 +106,14 @@ export const updateProject: APIGatewayProxyHandlerV2 = async (event) => {
 		UpdateExpression: `
 			SET title = :title,
 				description = :description,
-			  featuredImage = :featuredImage,
+			  mediaUrl = :mediaUrl,
 				createdAt = :createdAt,
 			  updatedAt = :updatedAt
 		`,
 		ExpressionAttributeValues: {
 			':title': body.title,
 			':description': body.description,
-			':featuredImage': body.imageKey,
+			':featuredImage': body.mediaUrl,
 			':createdAt': body.createdAt,
 			':updatedAt': Date.now()
 		}

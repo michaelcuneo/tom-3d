@@ -3,8 +3,8 @@ type Project = {
 	title: string;
 	description: string;
 	sort: number;
-	featuredImage?: string | null;
-	featuredImageUrl?: string | null;
+	mediaUrl: string;
+	featured: boolean;
 	updatedAt: AWSDateTime;
 	createdAt: AWSDateTime;
 };

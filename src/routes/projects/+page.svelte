@@ -4,8 +4,6 @@
   import Lander from '$lib/components/Lander.svelte';
   import ProjectCard from './ProjectCard.svelte';
   import AddProject from './AddProject.svelte';
-  import EditProject from './EditProject.svelte';
-	import AddProjectCard from './AddProjectCard.svelte';
 	import DeleteProject from './DeleteProject.svelte';
   
   let showAddModal = $state(false);
@@ -35,20 +33,21 @@
     selectedProject.set(project);
     showDeleteModal = true;
   }
+  $inspect(data);
 </script>
 
-<Lander header="3D Sound FX" subheader="Recent Projects" image="" position="center" updated={new Date()} />
+<Lander header="3D Sound FX" subheader="Recent Projects" image="" position="center" updated={new Date()} short={true} />
 
 <section class="projects-wrapper">
   <div class="project-grid">
     {#if data.isLoggedIn}
-      <AddProjectCard onclick={openAddModal} />
+      <ProjectCard onclick={openAddModal} isAddCard={true} />
     {/if}
     {#each projects as project (project.projectId)}
       <ProjectCard
         title={project.title}
         description={project.description}
-        imageUrl={project.featuredImageUrl}
+        mediaUrl={project.mediaUrl}
         isLoggedIn={data.isLoggedIn}
         onclickEdit={() => openEditModal(project)}
         onclickDelete={() => openDeleteModal(project)}
@@ -64,7 +63,7 @@
 {/if}
 
 {#if showEditModal}
-  <EditProject
+  <AddProject
     onclickClose={() => (showEditModal = false)}
   />
 {/if}

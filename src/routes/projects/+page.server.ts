@@ -4,25 +4,18 @@ import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client
 
 const s3 = new S3Client({});
 
+function isVideoUrl(url: string) {
+	return /youtube\.com|youtu\.be|vimeo\.com/i.test(url);
+}
+
 export const load: PageServerLoad = async ({ fetch, locals }) => {
 	const apiUrl = `${Resource.ThomasProjectApi.url}/projects/list?t=${Date.now()}`;
 	const resp = await fetch(apiUrl, { headers: { 'cache-control': 'no-store' } });
 
 	if (!resp.ok) throw new Error('Failed to fetch projects');
 
-	const rawProjects: { featuredImage?: string; title: string; description: string }[] =
+	const projects: { featuredImage?: string; title: string; description: string }[] =
 		await resp.json();
-
-	const projects = await Promise.all(
-		rawProjects.map(async (proj) => {
-			if (proj.featuredImage) {
-				const region = process.env.AWS_REGION ?? 'us-east-1'; // fallback if not set
-				const url = `https://${Resource.ThomasBucket.name}.s3.${region}.amazonaws.com/${proj.featuredImage}?t=${Date.now()}`;
-				return { ...proj, featuredImageUrl: url };
-			}
-			return { ...proj, featuredImageUrl: undefined };
-		})
-	);
 
 	const isLoggedIn = !!locals.session;
 
@@ -35,46 +28,54 @@ export const load: PageServerLoad = async ({ fetch, locals }) => {
 export const actions: Actions = {
 	createProject: async ({ request }) => {
 		const data = await request.formData();
+
 		const title = data.get('title')?.toString();
 		const description = data.get('description')?.toString();
-		const featured = data.get('featured') === 'true';
-		const imageKey = data.get('imageKey')?.toString();
-		const full = data.get('file_full') as File;
-		const thumb = data.get('file_thumb') as File;
-		const sort = featured ? Date.now() + 1_000_000_000_000 : Date.now();
+		const mediaUrl = data.get('mediaUrl')?.toString();
+		const full = data.get('file_full') as File | null;
 
-		if (!title || !description || !imageKey || !full || !thumb) {
+		if (!title || !description || !mediaUrl) {
 			return { error: 'Missing required fields or files' };
 		}
 
-		// Upload to S3
-		await Promise.all([
-			s3.send(
+		// Determine sort order (or use your own logic)
+		const sort = Date.now();
+
+		// 🧠 Check if it's a video or image
+		let finalMediaUrl = mediaUrl;
+
+		if (!isVideoUrl(mediaUrl) && full) {
+			// Upload to S3 if it's NOT a video
+			await s3.send(
 				new PutObjectCommand({
 					Bucket: Resource.ThomasBucket.name,
-					Key: imageKey,
+					Key: mediaUrl, // S3 key, not a full URL
 					Body: new Uint8Array(await full.arrayBuffer()),
 					ContentType: full.type
 				})
-			),
-			s3.send(
-				new PutObjectCommand({
-					Bucket: Resource.ThomasBucket.name,
-					Key: imageKey.replace(/\.\w+$/, '_thumb.webp'),
-					Body: new Uint8Array(await thumb.arrayBuffer()),
-					ContentType: thumb.type
-				})
-			)
-		]);
+			);
 
-		// Continue to API creation
-		const res = await fetch(Resource.ThomasProjectApi.url + '/project/create', {
+			// You can convert to full URL if your API expects that
+			finalMediaUrl = `https://${Resource.ThomasBucket.name}.s3.amazonaws.com/${mediaUrl}`;
+		}
+
+		// ✅ Send to API (S3 URL or video link)
+		const res = await fetch(`${Resource.ThomasProjectApi.url}/project/create`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ title, description, imageKey, sort })
+			body: JSON.stringify({
+				title,
+				description,
+				sort,
+				mediaUrl: finalMediaUrl
+			})
 		});
 
-		if (!res.ok) return { error: 'Failed to create project' };
+		if (!res.ok) {
+			console.error(await res.text());
+			return { error: 'Failed to create project' };
+		}
+
 		return { success: true };
 	},
 

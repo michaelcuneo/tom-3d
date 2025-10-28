@@ -1,48 +1,42 @@
 <script lang="ts">
+  import { fade, scale } from 'svelte/transition';
+  import { cubicOut } from 'svelte/easing';
   import { enhance, applyAction } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import Loader from '$lib/components/Loader.svelte';
   import { selectedProject } from '$lib/utils/state';
-	import type { SubmitFunction } from '@sveltejs/kit';
+  import type { SubmitFunction } from '@sveltejs/kit';
 
   let submitting = $state(false);
-
   let { onclickClose = () => {} } = $props();
 
   let projectId: string = $state($selectedProject?.projectId || '');
-  let imageKey: string = $state($selectedProject?.featuredImage || '');
+  let imageKey: string = $state($selectedProject?.mediaUrl || '');
   let sort: number = $state($selectedProject?.sort || 0);
 
-  function close() {
-    onclickClose();
-  }
+  const close = () => onclickClose();
 
-  const enhancement: SubmitFunction = ({ cancel }) => {
+  const enhancement: SubmitFunction = ({ cancel, formElement }) => {
+    submitting = true; // show loader before sending form
+
     return async ({ result }) => {
-      submitting = true;
-
       await applyAction(result);
 
       if (result.type === 'success') {
-        submitting = false;
         await invalidateAll();
-        close();
-        cancel();
-        return;
       } else {
-        submitting = false;
-        close();
-        cancel();
         console.error('Failed to delete project');
       }
 
-      return;
+      submitting = false;
+      close();
+      cancel();
     };
   };
 </script>
 
-<div class="modal-backdrop">
-  <div class="modal-content">
+<div class="modal-backdrop" transition:fade={{ duration: 200 }}>
+  <div class="modal-content" transition:scale={{ duration: 180, easing: cubicOut }}>
     <header>
       <h2>Delete Project</h2>
       <button class="close-btn" onclick={close}>×</button>
@@ -74,6 +68,7 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    backdrop-filter: blur(6px);
   }
 
   .modal-content {
@@ -84,6 +79,7 @@
     width: 100%;
     max-width: 500px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    transform-origin: center;
   }
 
   header {

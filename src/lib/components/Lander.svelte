@@ -3,12 +3,14 @@
 		header,
 		subheader,
 		image,
+		short = false,
 		position,
 		updated
 	}: {
 		header: string;
 		subheader: string;
 		image: string;
+		short?: boolean;
 		position: string;
 		updated?: Date;
 	} = $props();
@@ -22,7 +24,7 @@
 
 <div
 	class="lander"
-	style="background-image: url('{image}'); background-position: {position ? position : 'center'};"
+	style="background-image: url('{image}'); background-position: {position ? position : 'center'}; height: {short ? '25vh' : '45vh'};"
 >
 	<section>
 		<span class="head animate-fade">{header}</span>
@@ -71,7 +73,6 @@
 		justify-content: center;
 		align-items: center;
 		width: 100vw;
-		height: 45vh;
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -83,7 +84,7 @@
 		content: '';
 		position: absolute;
 		width: 100%;
-		height: 45vh;
+		height: 100%;
 		background-image: linear-gradient(
 			180deg,
 			rgba(12, 12, 12, 0.2),
@@ -124,11 +125,11 @@
 
 	@media (max-width: 800px) {
 		.lander {
-			height: 35vh;
+			height: 100%;
 		}
 
 		.lander::before {
-			height: 35vh;
+			height: 100%;
 		}
 
 		.lander {

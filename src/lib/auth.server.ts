@@ -4,11 +4,11 @@ import { Resource } from 'sst';
 
 export function createAuthClient(event: RequestEvent) {
 	return createClient({
-		clientID: 'booky-client',
+		clientID: '3dsoundfx-client',
 		issuer: Resource.ThomasAuth.url,
 		fetch: event.fetch
 	});
-};
+}
 
 export function setTokens(event: RequestEvent, access: string, refresh: string) {
 	event.cookies.set('refresh_token', refresh, {
@@ -23,7 +23,7 @@ export function setTokens(event: RequestEvent, access: string, refresh: string) 
 		path: '/',
 		maxAge: 34560000
 	});
-};
+}
 
 export function clearTokens(event: RequestEvent) {
 	event.cookies.delete('refresh_token', {
@@ -36,4 +36,4 @@ export function clearTokens(event: RequestEvent) {
 		sameSite: 'lax',
 		path: '/'
 	});
-};
+}

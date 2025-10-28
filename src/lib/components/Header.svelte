@@ -114,6 +114,7 @@
 
 	@media (max-width: 1024px) {
 		.animated-header {
+			width: 100vw;
       min-height: 72px;
       height: 190px;
 			flex-direction: row;
@@ -127,14 +128,15 @@
       margin: 1.2rem;
       height: 25px;
     }
-		hr {
+		hr.divider {
 			display: none;
 		}
 		ul.desktop-nav {
 			display: none;
 		}
 		.mobile-nav {
-			display: block;
+			display: flex;
+			align-items: center;
 		}
 	}
 </style>
